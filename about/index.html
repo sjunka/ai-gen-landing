@@ -465,7 +465,7 @@ a { color: inherit; }
       <div class="section-head reveal">
         <span class="label">Arquitectura de componentes</span>
         <h2 id="arch-h" class="display-md">Una aplicación Next.js, cuatro servicios gestionados.</h2>
-        <p class="body">No hay backend separado: las rutas de API viven dentro del mismo proyecto Next.js y se despliegan juntas en Vercel. Cuatro integraciones externas, cada una con un contrato fijado en <code class="mono">plan.md</code> antes de escribir código.</p>
+        <p class="body">No hay backend separado: las rutas de API viven dentro del mismo proyecto Next.js y se despliegan juntas en Vercel. Cuatro integraciones externas, cada una con un contrato fijado en <code class="mono">plan.md</code> antes de escribir código. El diagrama corre en bucle: cada punto es una llamada saliendo de Next.js, y el servicio late al recibirla.</p>
       </div>
 
       <div class="dg-wrap">
@@ -475,6 +475,7 @@ a { color: inherit; }
           <defs>
             <marker id="ar-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="var(--dg-muted)"/></marker>
             <marker id="ar-arrow-blue" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="var(--dg-blue)"/></marker>
+            <radialGradient id="ar-packet-glow"><stop offset="0%" stop-color="currentColor" stop-opacity="0.3"/><stop offset="100%" stop-color="currentColor" stop-opacity="0"/></radialGradient>
           </defs>
           <rect width="100%" height="100%" fill="var(--dg-paper)"/>
 
@@ -485,11 +486,11 @@ a { color: inherit; }
 
           <!-- Conectores (antes que nodos) -->
           <g class="dg-line" fill="none">
-            <path d="M300,86 V148" stroke="var(--dg-blue)" stroke-width="1.4" marker-end="url(#ar-arrow-blue)"/>
-            <path d="M232,224 V254 Q232,262 224,262 H180 Q172,262 172,270 V332" stroke="var(--dg-muted)" stroke-width="1.1" marker-end="url(#ar-arrow)"/>
-            <path d="M300,224 V376" stroke="var(--dg-muted)" stroke-width="1.1" marker-end="url(#ar-arrow)"/>
-            <path d="M368,224 V254 Q368,262 376,262 H420 Q428,262 428,270 V332" stroke="var(--dg-muted)" stroke-width="1.1" marker-end="url(#ar-arrow)"/>
-            <path d="M368,200 H584 Q592,200 592,208 V332" stroke="var(--dg-accent)" stroke-width="1.5" marker-end="url(#ar-arrow)"/>
+            <path class="ar-wire" data-node="1" data-tint="blue" data-say="Cliente → Next.js · HTTPS" d="M300,86 V148" stroke="var(--dg-blue)" stroke-width="1.4" marker-end="url(#ar-arrow-blue)"/>
+            <path class="ar-wire" data-node="2" data-say="Next.js → Clerk · sesión" d="M232,224 V254 Q232,262 224,262 H180 Q172,262 172,270 V332" stroke="var(--dg-muted)" stroke-width="1.1" marker-end="url(#ar-arrow)"/>
+            <path class="ar-wire" data-node="3" data-say="Next.js → MongoDB Atlas · datos" d="M300,224 V376" stroke="var(--dg-muted)" stroke-width="1.1" marker-end="url(#ar-arrow)"/>
+            <path class="ar-wire" data-node="4" data-say="Next.js → Vercel Blob · binarios" d="M368,224 V254 Q368,262 376,262 H420 Q428,262 428,270 V332" stroke="var(--dg-muted)" stroke-width="1.1" marker-end="url(#ar-arrow)"/>
+            <path class="ar-wire" data-node="5" data-tint="accent" data-say="Next.js → Higgsfield · generar" d="M368,200 H584 Q592,200 592,208 V332" stroke="var(--dg-accent)" stroke-width="1.5" marker-end="url(#ar-arrow)"/>
           </g>
 
           <!-- Cliente -->
@@ -525,19 +526,19 @@ a { color: inherit; }
             <text x="270" y="392" class="mono" font-size="8.5" fill="var(--dg-soft)">settings</text>
           </g>
           <g class="dg-node">
-            <rect x="410" y="332" width="140" height="80" rx="8" fill="var(--dg-surface)" stroke="var(--dg-ink)" stroke-width="1"/>
-            <image href="../assets/about/logos/vercel.svg" x="424" y="348" width="18" height="18"/>
-            <text x="452" y="362" font-size="11.5" font-weight="600" fill="var(--dg-ink)">Vercel Blob</text>
-            <text x="424" y="380" class="mono" font-size="8.5" fill="var(--dg-soft)">foto + imagen</text>
-            <text x="424" y="392" class="mono" font-size="8.5" fill="var(--dg-soft)">+ video, binarios</text>
+            <rect x="404" y="332" width="130" height="80" rx="8" fill="var(--dg-surface)" stroke="var(--dg-ink)" stroke-width="1"/>
+            <image href="../assets/about/logos/vercel.svg" x="418" y="348" width="18" height="18"/>
+            <text x="446" y="362" font-size="11.5" font-weight="600" fill="var(--dg-ink)">Vercel Blob</text>
+            <text x="418" y="380" class="mono" font-size="8.5" fill="var(--dg-soft)">foto + imagen</text>
+            <text x="418" y="392" class="mono" font-size="8.5" fill="var(--dg-soft)">+ video, binarios</text>
           </g>
           <g class="dg-node">
-            <rect x="522" y="332" width="150" height="80" rx="8" fill="var(--dg-accent-soft)" stroke="var(--dg-accent)" stroke-width="1.4"/>
-            <image href="../assets/about/logos/higgsfield.png" x="536" y="344" width="20" height="20"/>
-            <text x="564" y="360" font-size="12" font-weight="700" fill="var(--dg-ink)">Higgsfield</text>
-            <text x="536" y="378" class="mono" font-size="8.5" fill="var(--dg-muted)">único proveedor:</text>
-            <text x="536" y="390" class="mono" font-size="8.5" fill="var(--dg-muted)">soul · dop lite/std/turbo</text>
-            <text x="536" y="402" class="mono" font-size="8.5" fill="var(--dg-muted)">imagen y video</text>
+            <rect x="546" y="332" width="150" height="80" rx="8" fill="var(--dg-accent-soft)" stroke="var(--dg-accent)" stroke-width="1.4"/>
+            <image href="../assets/about/logos/higgsfield.png" x="560" y="344" width="20" height="20"/>
+            <text x="588" y="360" font-size="12" font-weight="700" fill="var(--dg-ink)">Higgsfield</text>
+            <text x="560" y="378" class="mono" font-size="8.5" fill="var(--dg-muted)">único proveedor:</text>
+            <text x="560" y="390" class="mono" font-size="8.5" fill="var(--dg-muted)">soul · dop lite/std/turbo</text>
+            <text x="560" y="402" class="mono" font-size="8.5" fill="var(--dg-muted)">imagen y video</text>
           </g>
 
           <!-- Etiquetas de conectores -->
@@ -552,7 +553,23 @@ a { color: inherit; }
             <text x="180" y="458" fill="var(--dg-blue)">— tráfico de cliente</text>
             <text x="360" y="458" fill="var(--dg-accent)">— proveedor de IA (foco)</text>
           </g>
+
+          <!-- Tráfico: un paquete por cable, poblado por JS -->
+          <g class="ar-traffic" aria-hidden="true"></g>
         </svg>
+      </div>
+
+      <!-- El bucle corre solo; el botón lo detiene (WCAG 2.2.2). Sólo con JS. -->
+      <div class="seq-transport" data-arch-transport hidden>
+        <div class="seq-transport-row">
+          <button type="button" class="seq-btn seq-btn-primary" data-arch="toggle" aria-label="Pausar el tráfico">
+            <svg class="seq-ico" data-arch-icon aria-hidden="true"><use href="#ico-pause"></use></svg>
+          </button>
+          <div class="seq-readout">
+            <span class="seq-step mono" data-arch-state>TRÁFICO EN VIVO</span>
+            <span class="seq-say caption" data-arch-say>Cliente → Next.js · HTTPS</span>
+          </div>
+        </div>
       </div>
       <div class="dg-legend">
         <div class="dg-legend-item"><span class="dg-dot node"></span><span class="caption">Servicio gestionado, contrato en <code class="mono">plan.md</code></span></div>
@@ -1106,7 +1123,111 @@ a { color: inherit; }
     });
   });
 
-  // ── 5 · Secuencia: una sola línea de tiempo pausada, con transporte ──
+  // ── 5 · Arquitectura: tráfico en bucle por los cables ────────────────
+  //
+  // Ambiente, no narración: un paquete por conector recorre su cable y el
+  // nodo destino late al recibirlo. Mismo motor que la secuencia — geometría
+  // medida una vez con getTotalLength() y posición como función pura del
+  // progreso — pero en `repeat: -1`, así que corre indefinidamente. El botón
+  // existe porque un movimiento automático de más de 5s debe poder detenerse.
+  var arch = document.querySelector('#arquitectura [data-diagram]');
+  var archUI = document.querySelector('[data-arch-transport]');
+  if (arch && archUI) {
+    var LEAD = 0.55;   // retraso entre la llamada del cliente y las de servicio
+    var GAP = 0.16;    // desfase entre los tres servicios internos
+    var arLayer = arch.querySelector('.ar-traffic');
+    var arNodes = Array.prototype.slice.call(arch.querySelectorAll('.dg-node'));
+
+    var wires = Array.prototype.slice.call(arch.querySelectorAll('.ar-wire')).map(function (path, i) {
+      var tint = path.dataset.tint === 'blue' ? 'var(--dg-blue)'
+               : path.dataset.tint === 'accent' ? 'var(--dg-accent)'
+               : 'var(--dg-muted)';
+      var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      g.setAttribute('opacity', '0');
+      g.style.color = tint;
+      g.innerHTML = '<circle r="9" fill="url(#ar-packet-glow)"/><circle r="2.6" fill="' + tint + '"/>';
+      arLayer.appendChild(g);
+      // El nodo destino: su <rect> da el centro para el latido.
+      var node = arNodes[+path.dataset.node];
+      var r = node.querySelector('rect');
+      return {
+        path: path, len: path.getTotalLength(), packet: g, node: node,
+        cx: +r.getAttribute('x') + +r.getAttribute('width') / 2,
+        cy: +r.getAttribute('y') + +r.getAttribute('height') / 2,
+        say: path.dataset.say,
+        // El cliente entra primero; los tres servicios se escalonan; el
+        // proveedor de IA arranca al final y viaja más lento (viaje largo).
+        at: i === 0 ? 0 : (i === 4 ? LEAD + GAP * 3 : LEAD + GAP * (i - 1)),
+        dur: i === 0 ? 0.7 : (i === 4 ? 1.15 : 0.85)
+      };
+    });
+
+    var archTl = gsap.timeline({ paused: true, repeat: -1, repeatDelay: 0.7 });
+
+    wires.forEach(function (w) {
+      var trip = { p: 0 };
+      archTl.fromTo(trip, { p: 0 }, {
+        p: 1, duration: w.dur, ease: 'power1.inOut',
+        onUpdate: function () {
+          var pt = w.path.getPointAtLength(trip.p * w.len);
+          w.packet.setAttribute('transform', 'translate(' + pt.x + ',' + pt.y + ')');
+        }
+      }, w.at);
+      archTl.fromTo(w.packet, { opacity: 0 }, { opacity: 1, duration: 0.14 }, w.at);
+      archTl.to(w.packet, { opacity: 0, duration: 0.16 }, w.at + w.dur - 0.16);
+      // Latido del nodo destino: llega el paquete, el servicio responde.
+      gsap.set(w.node, { svgOrigin: w.cx + ' ' + w.cy });
+      archTl.to(w.node, { scale: 1.03, duration: 0.14, ease: 'power2.out' }, w.at + w.dur - 0.1);
+      archTl.to(w.node, { scale: 1, duration: 0.42, ease: 'back.out(2.6)' }, w.at + w.dur + 0.04);
+    });
+
+    // Lectura: qué cable está vivo ahora, derivada del tiempo del ciclo.
+    var arSayEl = archUI.querySelector('[data-arch-say]');
+    var arStateEl = archUI.querySelector('[data-arch-state]');
+    var toggleA = archUI.querySelector('[data-arch="toggle"]');
+    var toggleAIco = toggleA.querySelector('use');
+    var lastWire = -1;
+    archTl.eventCallback('onUpdate', function () {
+      var t = archTl.time();
+      var live = -1;
+      wires.forEach(function (w, i) { if (t >= w.at && t <= w.at + w.dur) live = i; });
+      if (live === -1 || live === lastWire) return;
+      lastWire = live;
+      arSayEl.textContent = wires[live].say;
+    });
+
+    function syncArch() {
+      var running = !archTl.paused();
+      toggleAIco.setAttribute('href', running ? '#ico-pause' : '#ico-play');
+      toggleA.setAttribute('aria-label', running ? 'Pausar el tráfico' : 'Reanudar el tráfico');
+      toggleA.setAttribute('aria-pressed', running ? 'false' : 'true');
+      arStateEl.textContent = running ? 'TRÁFICO EN VIVO' : 'TRÁFICO EN PAUSA';
+    }
+
+    var archPaused = false;
+    toggleA.addEventListener('click', function () {
+      if (archTl.paused()) archTl.play(); else archTl.pause();
+      archPaused = archTl.paused();
+      syncArch();
+    });
+
+    archUI.hidden = false;
+    syncArch();
+
+    // Corre sólo mientras el diagrama está en pantalla. Arranca por debajo de
+    // la entrada de nodos (78%) para no pelear con ella por el mismo scale.
+    var archST = ScrollTrigger.create({
+      trigger: arch, start: 'top 62%', end: 'bottom 20%',
+      onToggle: function (self) {
+        if (self.isActive && !archPaused) archTl.play();
+        else if (!self.isActive) archTl.pause();
+        syncArch();
+      }
+    });
+    if (archST.isActive) { archTl.play(); syncArch(); }
+  }
+
+  // ── 6 · Secuencia: una sola línea de tiempo pausada, con transporte ──
   //
   // Reglas HyperFrames compuestas aquí: `svg-path-draw` (cada flecha se traza
   // con stroke-dashoffset medido, no adivinado), `chart-scrub-readout` (un
