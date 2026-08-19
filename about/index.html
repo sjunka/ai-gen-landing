@@ -179,6 +179,19 @@ a { color: inherit; }
 .callout p { font-family: var(--font-display); font-style: italic; font-size: 17px; line-height: 1.5; color: var(--color-ink-muted); max-width: 58ch; }
 
 /* ── El método: tarjetas Owns / Never touches ─────────────────────────── */
+/* ── Comparación de respuestas: imagen (1) vs video (sondeo) ──────────── */
+.response-compare { display: grid; gap: 16px; margin-top: 32px; }
+@media (min-width: 640px) { .response-compare { grid-template-columns: 1fr 1fr; } }
+.response-card { background: var(--color-surface-2); border: 1px solid var(--color-hairline); border-radius: 12px; padding: 20px; }
+.response-card h4 { font-size: 14px; font-weight: 600; color: var(--color-ink); margin-bottom: 4px; }
+.response-card .sub { color: var(--color-ink-subtle); margin-bottom: 16px; }
+.response-row { font-family: var(--font-mono); font-size: 12px; line-height: 1.5; border-radius: 6px; padding: 8px 10px; margin-bottom: 6px; background: var(--color-surface-3); color: var(--color-ink-muted); }
+.response-row .method { color: var(--color-ink); font-weight: 600; }
+.response-row.pending { opacity: 0.55; }
+.response-row.ready { background: var(--dg-accent-soft); border: 1px solid var(--color-primary); color: var(--color-ink); }
+.response-row.ready .method { color: var(--color-primary); }
+.response-rows-poll { margin-top: 6px; }
+
 /* ── El ciclo de Spec Kit: tabla animada, comando → archivo ───────────── */
 .cycle-wrap { margin-top: 40px; overflow-x: auto; }
 .cycle-table { width: 100%; border-collapse: collapse; min-width: 640px; }
@@ -649,6 +662,26 @@ a { color: inherit; }
         <div class="dg-legend-item"><span class="caption mono">▭ LOOP</span><span class="caption">fragmento combinado (repetición)</span></div>
       </div>
       <p class="body section-note">La imagen se genera dentro de una sola llamada — Next.js sondea a Higgsfield internamente, cada 2s hasta 90 intentos, y responde una vez con el resultado. El video sí expone su espera: <code class="mono">/api/video/[id]</code> se consulta cada tres segundos desde el cliente hasta que el estado deja de ser <code class="mono">pending</code> (FR-012).</p>
+
+      <div class="response-compare">
+        <div class="response-card reveal">
+          <h4>Imagen — una respuesta</h4>
+          <p class="sub caption">El cliente pregunta una sola vez. El sondeo a Higgsfield pasa adentro de Next.js — invisible desde aquí.</p>
+          <div class="response-row"><span class="method">POST</span> /api/image</div>
+          <div class="response-row ready"><span class="method">200</span> { "imageUrl": "…generated.jpg" }</div>
+        </div>
+        <div class="response-card reveal">
+          <h4>Video — sondeo hasta listo</h4>
+          <p class="sub caption">El cliente sí ve la espera: la misma pregunta, cada 3s, hasta que la respuesta cambia de forma.</p>
+          <div class="response-row"><span class="method">POST</span> /api/video → <span class="method">200</span> { "jobId": "8f2a…" }</div>
+          <div class="response-rows-poll reveal-stagger">
+            <div class="response-row pending"><span class="method">GET</span> /api/video/8f2a — { "status": "pending" }</div>
+            <div class="response-row pending"><span class="method">GET</span> /api/video/8f2a — { "status": "pending" }</div>
+            <div class="response-row ready"><span class="method">GET</span> /api/video/8f2a — { "status": "ready", "videoUrl": "…mp4" }</div>
+          </div>
+        </div>
+      </div>
+      <p class="caption section-note">Mismas rutas, mismo cliente. La diferencia no está en el diagrama de arriba — está en cuántas veces la respuesta dice lo mismo antes de cambiar.</p>
     </div>
   </section>
 
