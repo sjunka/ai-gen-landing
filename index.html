@@ -358,7 +358,9 @@ a { color: inherit; }
 }
 .closing > .shell { position: relative; }
 .closing h2 { margin-bottom: 28px; max-width: 16ch; margin-inline: auto; }
+.closing-actions { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }
 .closing .caption { margin-top: 24px; color: var(--color-ink-subtle); }
+.btn-ico { width: 18px; height: 18px; flex: none; }
 
 .foot { padding-block: 64px 48px; border-top: 1px solid var(--color-hairline); }
 .foot-cols { display: grid; gap: 32px; }
@@ -800,7 +802,18 @@ html:has(.qr-modal[open]) .topbar { backdrop-filter: none; }
   <section class="closing" aria-labelledby="cierre-h">
     <div class="shell">
       <h2 id="cierre-h" class="display-lg">Toma una foto. Mira qué sale.</h2>
-      <a class="btn btn-primary" href="https://ia-generator-openspec.vercel.app/">Probar la app</a>
+      <div class="closing-actions">
+        <a class="btn btn-primary" href="https://ia-generator-openspec.vercel.app/">Probar la app</a>
+        <button type="button" class="btn btn-tertiary" data-qr-open aria-haspopup="dialog">
+          <svg class="btn-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="6" height="6" rx="1.5"/>
+            <rect x="15" y="3" width="6" height="6" rx="1.5"/>
+            <rect x="3" y="15" width="6" height="6" rx="1.5"/>
+            <path d="M15 15h2v2h-2zM19 15h2M15 19h2M19 19h2"/>
+          </svg>
+          Escanear QR
+        </button>
+      </div>
       <p class="caption">El código, la especificación y los 39 tickets están en GitHub.</p>
     </div>
   </section>
@@ -900,13 +913,15 @@ html:has(.qr-modal[open]) .topbar { backdrop-filter: none; }
 // va la entrada y la salida animadas, y devolver el foco al botón al cerrar.
 (function () {
   var modal = document.getElementById('qr-modal');
-  var opener = document.querySelector('[data-qr-open]');
-  if (!modal || !opener || typeof modal.showModal !== 'function') return;
+  var openers = Array.prototype.slice.call(document.querySelectorAll('[data-qr-open]'));
+  if (!modal || !openers.length || typeof modal.showModal !== 'function') return;
+  var lastOpener = openers[0];
   // Con movimiento reducido la hoja anula toda transición, así que esperar a
   // transitionend colgaría el cierre: el tiempo de salida pasa a cero.
   var OUT = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 240;
 
-  function open() {
+  function open(e) {
+    lastOpener = (e && e.currentTarget) || lastOpener;
     modal.showModal();
     requestAnimationFrame(function () { modal.dataset.open = 'true'; });
   }
@@ -916,13 +931,13 @@ html:has(.qr-modal[open]) .topbar { backdrop-filter: none; }
     setTimeout(function () { modal.close(); }, OUT);
   }
 
-  opener.addEventListener('click', open);
+  openers.forEach(function (btn) { btn.addEventListener('click', open); });
   modal.querySelector('[data-qr-close]').addEventListener('click', close);
   // Clic fuera de la tarjeta: el <dialog> ocupa todo, así que el blanco es él.
   modal.addEventListener('click', function (e) { if (e.target === modal) close(); });
   // Escape lo cierra el navegador de golpe; lo interceptamos para animarlo.
   modal.addEventListener('cancel', function (e) { e.preventDefault(); close(); });
-  modal.addEventListener('close', function () { modal.dataset.open = 'false'; opener.focus(); });
+  modal.addEventListener('close', function () { modal.dataset.open = 'false'; lastOpener.focus(); });
 })();
 </script>
 </body>
