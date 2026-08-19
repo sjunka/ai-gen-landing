@@ -233,11 +233,92 @@ a { color: inherit; }
 .versus-wrap .ledger { margin-top: 0; min-width: 640px; }
 
 /* ── El veredicto: tres cifras grandes ───────────────────────────────── */
-.verdict { display: grid; gap: 32px; margin-top: 48px; }
-.verdict > div { border-top: 1px solid var(--color-hairline); padding-top: 20px; }
-.verdict dt { font-size: 14px; color: var(--color-ink-subtle); order: 2; }
+/* ── Las tres maneras: una tarjeta por método ─────────────────────────
+   Subgrid: las filas se declaran una vez en el contenedor y cada tarjeta
+   las hereda, así "Pruebas" queda a la misma altura en las tres aunque el
+   texto de cada una mida distinto. Sin eso, la comparación se lee torcida. */
+.section-head .eyebrow { display: block; color: var(--color-ink-tertiary); margin-bottom: 12px; }
+
+.methods {
+  display: grid; gap: 16px; margin-top: 48px;
+  grid-template-columns: 1fr;
+}
+.method {
+  display: grid; gap: 0;
+  padding: 26px 24px 24px;
+  border: 1px solid var(--color-hairline);
+  border-radius: 18px;
+  background: var(--color-surface-2);
+  --m-ink: var(--color-ink);
+  --m-muted: var(--color-ink-muted);
+  --m-subtle: var(--color-ink-subtle);
+  --m-hair: var(--color-hairline);
+  --m-track: var(--color-surface-4);
+}
+/* La recomendada se invierte: es el único bloque oscuro de la página, así
+   que el ojo aterriza ahí sin que haga falta una flecha ni un "¡mejor!". */
+.method.is-sdd {
+  background: var(--color-ink);
+  border-color: var(--color-ink);
+  box-shadow: var(--shadow-lift);
+  --m-ink: #ffffff;
+  --m-muted: rgba(255, 255, 255, 0.76);
+  --m-subtle: rgba(255, 255, 255, 0.56);
+  --m-hair: rgba(255, 255, 255, 0.16);
+  --m-track: rgba(255, 255, 255, 0.14);
+}
+
+.m-head { display: flex; flex-direction: column; align-items: start; gap: 10px; }
+.m-name { font-size: 15px; font-weight: 500; color: var(--m-ink); margin: 0; }
+.m-badge {
+  display: inline-flex; align-items: center; border-radius: 9999px;
+  padding: 4px 10px; font: 600 10.5px/1.4 var(--font-sans);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  background: rgba(255, 255, 255, 0.14); color: #fff;
+}
+.m-badge.is-ghost { display: none; }
+
+.m-capex { margin: 18px 0 0; color: var(--m-ink); font-variant-numeric: tabular-nums; }
+.m-formula { margin: 4px 0 0; font-size: 13px; color: var(--m-subtle); }
+
+/* Barra proporcional: la cifra dice cuánto, la barra deja verlo. */
+.m-bar { display: flex; align-items: center; gap: 10px; margin-top: 18px; }
+.m-bar::before {
+  content: ""; flex: 1; height: 6px; border-radius: 999px;
+  background: var(--m-track);
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-size: 0% 100%;
+  color: var(--m-ink);
+}
+.m-bar-pct { font: 500 12px/1 var(--font-mono); color: var(--m-subtle); font-variant-numeric: tabular-nums; }
+@keyframes bar-grow { from { background-size: 0% 100%; } }
+.method:nth-child(1) .m-bar::before { background-size: 100% 100%; }
+.method:nth-child(2) .m-bar::before { background-size: 38% 100%; }
+.method:nth-child(3) .m-bar::before { background-size: 18% 100%; }
+
+.m-time { margin: 20px 0 0; font-size: 14px; color: var(--m-muted); }
+.m-time b { font-weight: 500; color: var(--m-ink); }
+.m-flow { display: block; margin-top: 4px; font-size: 13px; color: var(--m-subtle); }
+
+.m-attrs { margin-top: 22px; padding-top: 4px; border-top: 1px solid var(--m-hair); display: grid; gap: 0; }
+.m-attr { display: flex; gap: 10px; align-items: start; padding-block: 14px; border-bottom: 1px solid var(--m-hair); }
+.m-attr:last-child { border-bottom: 0; padding-bottom: 0; }
+.m-ico { width: 18px; height: 18px; flex: none; margin-top: 1px; }
+.m-attr[data-state="yes"] .m-ico { color: var(--m-ink); }
+.m-attr[data-state="no"] .m-ico { color: var(--color-ink-tertiary); }
+.m-attr[data-state="half"] .m-ico { color: var(--color-ink-tertiary); }
+.m-attr-k { display: block; font-size: 13px; font-weight: 500; color: var(--m-ink); }
+.m-attr-v { display: block; margin-top: 2px; font-size: 13px; line-height: 1.45; color: var(--m-subtle); }
+
+.methods-note { margin-top: 24px; color: var(--color-ink-subtle); max-width: 62ch; }
+.methods-note b { font-weight: 500; color: var(--color-ink); }
+
+.verdict { display: grid; gap: 32px; margin-top: 56px; }
+.verdict > div { border-top: 1px solid var(--color-hairline-strong); padding-top: 22px; }
+.verdict dt { font-size: 14px; line-height: 1.5; color: var(--color-ink-subtle); order: 2; max-width: 34ch; }
 .verdict dd { margin: 0 0 6px; }
-.verdict .display-sm { font-size: clamp(34px, 3vw + 16px, 48px); }
+.verdict .display-sm { font-size: clamp(38px, 3vw + 18px, 54px); font-variant-numeric: tabular-nums; letter-spacing: -0.03em; }
 
 /* ── Supuestos ───────────────────────────────────────────────────────── */
 .assumptions { margin-top: 48px; border-top: 1px solid var(--color-hairline); }
@@ -277,6 +358,16 @@ a { color: inherit; }
   }
   .enter:nth-child(2) { animation-delay: 60ms; }
   .enter:nth-child(3) { animation-delay: 120ms; }
+
+  /* Las barras se llenan cuando las tarjetas entran, no al cargar la página:
+     el crecimiento es el argumento, y hay que verlo pasar. Sin timeline de
+     vista (o con movimiento reducido) quedan dibujadas en su valor final,
+     que es el que ya declara la regla estática de cada tarjeta. */
+  .m-bar::before {
+    animation: bar-grow 1ms linear both;
+    animation-timeline: view();
+    animation-range: entry 10% entry 55%;
+  }
 }
 
 /* ── Ensanchado: solo min-width ──────────────────────────────────────── */
@@ -291,6 +382,20 @@ a { color: inherit; }
   .stats-grid { grid-template-columns: repeat(4, 1fr); }
   .foot-cols { grid-template-columns: repeat(3, 1fr); }
   .verdict { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (min-width: 900px) {
+  .methods {
+    grid-template-columns: repeat(3, 1fr);
+    /* head · cifra · fórmula · barra · tiempo · tres atributos */
+    grid-template-rows: auto auto auto auto auto auto auto auto;
+    align-items: stretch;
+  }
+  .method { grid-row: span 8; grid-template-rows: subgrid; }
+  .method .m-attrs { display: contents; }
+  .method .m-attr:first-of-type { margin-top: 22px; border-top: 1px solid var(--m-hair); }
+  .method .m-attr:last-child { padding-bottom: 0; }
+  .m-badge.is-ghost { display: inline-flex; visibility: hidden; }
 }
 
 @media (min-width: 768px) {
@@ -438,75 +543,109 @@ a { color: inherit; }
   </section>
 
   <!-- ── 5 · La comparativa ─────────────────────────────────────────── -->
-  <section class="section" aria-labelledby="versus-h" style="padding-top:0">
+  <section class="section versus-section" aria-labelledby="versus-h" style="padding-top:0">
     <div class="shell">
       <div class="section-head enter">
+        <span class="label eyebrow">La comparación</span>
         <h2 id="versus-h" class="display-md">Tres maneras de construir la misma app.</h2>
-        <p class="body">Los mismos 39 tickets, el mismo equipo de cinco, la misma tarifa de US$ 15 por hora. Lo único que cambia es el método.</p>
+        <p class="body">Mismo alcance y mismo equipo en los tres casos: 39 tickets, cinco personas, una tarifa de US$ 15 la hora. Lo único que cambia es cómo se organiza el trabajo. Esto es lo que cuesta cada camino.</p>
       </div>
 
-      <div class="versus-wrap enter">
-        <table class="ledger versus">
-          <caption class="skip-visually">Comparativa de costo, tiempo y calidad entre los tres métodos</caption>
-          <thead>
-            <tr>
-              <th scope="col"><span class="skip-visually">Criterio</span></th>
-              <th scope="col">A la antigüita</th>
-              <th scope="col">Prompts sueltos</th>
-              <th scope="col" class="is-sdd">Spec-Driven Development</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <th scope="row">Horas de trabajo</th>
-              <td><span class="num">240 h</span>escribir cada archivo a mano, más integración</td>
-              <td><span class="num">90 h</span>generar rápido, integrar a mano, corregir dos veces</td>
-              <td class="is-sdd"><span class="num">40 h</span>28 h de especificación + 12 h supervisando agentes</td>
-            </tr>
-            <tr>
-              <th scope="row">CAPEX</th>
-              <td><span class="num">US$ 3.600</span>240 h × US$ 15</td>
-              <td><span class="num">US$ 1.365</span>90 h × US$ 15 + US$ 15 de tokens</td>
-              <td class="is-sdd"><span class="num">US$ 635</span>40 h × US$ 15 + US$ 35 de tokens</td>
-            </tr>
-            <tr>
-              <th scope="row">Tiempo calendario</th>
-              <td><span class="num">6 semanas</span>el frontend espera al backend</td>
-              <td><span class="num">2 semanas</span>rápido al inicio, lento al integrar</td>
-              <td class="is-sdd"><span class="num">4 días</span>3 fases en paralelo, en ramas que no chocan</td>
-            </tr>
-            <tr>
-              <th scope="row">Pruebas</th>
-              <td>si el cronograma alcanza — suele no alcanzar</td>
-              <td>casi nunca: el prompt pide la feature, no la prueba</td>
-              <td class="is-sdd">obligatorias por constitución: la prueba se escribe antes que el código</td>
-            </tr>
-            <tr>
-              <th scope="row">Trabajo en paralelo</th>
-              <td>con coordinación constante y merges dolorosos</td>
-              <td>dos chats generando sobre los mismos archivos: conflicto seguro</td>
-              <td class="is-sdd">cada fase declara sus archivos; cero conflictos por diseño</td>
-            </tr>
-            <tr>
-              <th scope="row">¿Es repetible?</th>
-              <td>solo si el equipo documenta — casi nunca documenta</td>
-              <td>no: el conocimiento se queda en el historial del chat</td>
-              <td class="is-sdd">sí: la especificación reconstruye la app desde cero, con otro equipo u otro agente</td>
-            </tr>
-            <tr>
-              <th scope="row">OPEX mensual</th>
-              <td><span class="num">US$ 0</span>misma infraestructura</td>
-              <td><span class="num">US$ 0</span>misma infraestructura</td>
-              <td class="is-sdd"><span class="num">US$ 0</span>+ control del gasto variable dentro de la app</td>
-            </tr>
-          </tbody>
-        </table>
+      <!-- Iconos de estado. Un color solo no puede llevar el significado: cada
+           fila trae además su forma, y el <use> repite el mismo trazo. -->
+      <svg class="ico-sprite" aria-hidden="true" focusable="false" width="0" height="0" style="position:absolute">
+        <symbol id="ico-yes" viewBox="0 0 20 20"><path d="M4.5 10.5 8 14l7.5-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+        <symbol id="ico-no" viewBox="0 0 20 20"><path d="M5.5 5.5l9 9m0-9-9 9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+        <symbol id="ico-half" viewBox="0 0 20 20"><path d="M5 10h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+      </svg>
+
+      <div class="methods enter">
+        <article class="method">
+          <header class="m-head">
+            <h3 class="m-name">A la antigüita</h3>
+            <span class="m-badge is-ghost" aria-hidden="true">·</span>
+          </header>
+          <p class="m-capex display-sm">US$ 3.600</p>
+          <p class="m-formula">240 horas × US$ 15</p>
+          <div class="m-bar" role="img" aria-label="100 % del presupuesto">
+            <span class="m-bar-pct">100 %</span>
+          </div>
+          <p class="m-time"><b>6 semanas</b> hasta producción<span class="m-flow">El frontend espera al backend para poder avanzar.</span></p>
+          <div class="m-attrs">
+          <div class="m-attr" data-state="no">
+            <svg class="m-ico" viewBox="0 0 20 20" aria-hidden="true"><use href="#ico-no"></use></svg>
+            <div><span class="m-attr-k">Pruebas</span><span class="m-attr-v">Si el cronograma alcanza. Casi nunca alcanza.</span></div>
+          </div>
+          <div class="m-attr" data-state="half">
+            <svg class="m-ico" viewBox="0 0 20 20" aria-hidden="true"><use href="#ico-half"></use></svg>
+            <div><span class="m-attr-k">Trabajo en paralelo</span><span class="m-attr-v">Posible, con coordinación constante y merges dolorosos.</span></div>
+          </div>
+          <div class="m-attr" data-state="half">
+            <svg class="m-ico" viewBox="0 0 20 20" aria-hidden="true"><use href="#ico-half"></use></svg>
+            <div><span class="m-attr-k">Repetible</span><span class="m-attr-v">Solo si el equipo documenta al día. Casi nadie lo hace.</span></div>
+          </div>
+          </div>
+        </article>
+        <article class="method">
+          <header class="m-head">
+            <h3 class="m-name">Prompts sueltos</h3>
+            <span class="m-badge is-ghost" aria-hidden="true">·</span>
+          </header>
+          <p class="m-capex display-sm">US$ 1.365</p>
+          <p class="m-formula">90 horas × US$ 15 + US$ 15 de tokens</p>
+          <div class="m-bar" role="img" aria-label="38 % del presupuesto">
+            <span class="m-bar-pct">38 %</span>
+          </div>
+          <p class="m-time"><b>2 semanas</b> hasta producción<span class="m-flow">Rápido el primer día, lento cuando toca integrar.</span></p>
+          <div class="m-attrs">
+          <div class="m-attr" data-state="no">
+            <svg class="m-ico" viewBox="0 0 20 20" aria-hidden="true"><use href="#ico-no"></use></svg>
+            <div><span class="m-attr-k">Pruebas</span><span class="m-attr-v">El prompt pide la función, no la prueba que la respalda.</span></div>
+          </div>
+          <div class="m-attr" data-state="no">
+            <svg class="m-ico" viewBox="0 0 20 20" aria-hidden="true"><use href="#ico-no"></use></svg>
+            <div><span class="m-attr-k">Trabajo en paralelo</span><span class="m-attr-v">Dos chats escribiendo sobre los mismos archivos.</span></div>
+          </div>
+          <div class="m-attr" data-state="no">
+            <svg class="m-ico" viewBox="0 0 20 20" aria-hidden="true"><use href="#ico-no"></use></svg>
+            <div><span class="m-attr-k">Repetible</span><span class="m-attr-v">El criterio se queda en el historial del chat.</span></div>
+          </div>
+          </div>
+        </article>
+        <article class="method is-sdd">
+          <header class="m-head">
+            <h3 class="m-name">Spec-Driven Development</h3>
+            <span class="m-badge">El método de este proyecto</span>
+          </header>
+          <p class="m-capex display-sm">US$ 635</p>
+          <p class="m-formula">40 horas × US$ 15 + US$ 35 de tokens</p>
+          <div class="m-bar" role="img" aria-label="18 % del presupuesto">
+            <span class="m-bar-pct">18 %</span>
+          </div>
+          <p class="m-time"><b>4 días</b> hasta producción<span class="m-flow">Tres fases avanzan a la vez, en ramas que no se cruzan.</span></p>
+          <div class="m-attrs">
+          <div class="m-attr" data-state="yes">
+            <svg class="m-ico" viewBox="0 0 20 20" aria-hidden="true"><use href="#ico-yes"></use></svg>
+            <div><span class="m-attr-k">Pruebas</span><span class="m-attr-v">Obligatorias por constitución: primero la prueba, después el código.</span></div>
+          </div>
+          <div class="m-attr" data-state="yes">
+            <svg class="m-ico" viewBox="0 0 20 20" aria-hidden="true"><use href="#ico-yes"></use></svg>
+            <div><span class="m-attr-k">Trabajo en paralelo</span><span class="m-attr-v">Cada fase declara sus archivos. Cero conflictos por diseño.</span></div>
+          </div>
+          <div class="m-attr" data-state="yes">
+            <svg class="m-ico" viewBox="0 0 20 20" aria-hidden="true"><use href="#ico-yes"></use></svg>
+            <div><span class="m-attr-k">Repetible</span><span class="m-attr-v">La especificación reconstruye la app con otro equipo u otro agente.</span></div>
+          </div>
+          </div>
+        </article>
       </div>
+
+      <p class="caption methods-note enter">En los tres casos la operación cuesta lo mismo: <b>US$ 0 al mes</b>, porque la infraestructura no cambia. Lo que cambia es lo que cuesta llegar hasta ahí.</p>
 
       <dl class="verdict">
-        <div class="enter"><dd class="display-sm mono">− 82 %</dd><dt>de costo de construcción frente al desarrollo a la antigüita: US$ 635 contra US$ 3.600.</dt></div>
-        <div class="enter"><dd class="display-sm mono">4,7 : 1</dd><dt>retorno sobre lo invertido: cada dólar del método ahorra US$ 4,7 del presupuesto tradicional.</dt></div>
-        <div class="enter"><dd class="display-sm mono">− 90 %</dd><dt>de tiempo hasta producción: de seis semanas a cuatro días.</dt></div>
+        <div class="enter"><dd class="display-sm">−82 %</dd><dt>menos costo de construcción que a la antigüita: US$ 635 en lugar de US$ 3.600.</dt></div>
+        <div class="enter"><dd class="display-sm">4,7 : 1</dd><dt>de retorno: cada dólar invertido en el método ahorra US$ 4,70 del presupuesto tradicional.</dt></div>
+        <div class="enter"><dd class="display-sm">−90 %</dd><dt>menos tiempo hasta producción: de seis semanas a cuatro días.</dt></div>
       </dl>
     </div>
   </section>
@@ -515,20 +654,21 @@ a { color: inherit; }
   <section class="section" aria-labelledby="rigor-h" style="padding-top:0">
     <div class="shell">
       <div class="section-head enter">
-        <h2 id="rigor-h" class="display-md">Los prompts sueltos también son baratos. Lo que no son es rigurosos.</h2>
-        <p class="body">La diferencia entre pedirle código a un chat y ejecutar una especificación no está en la velocidad del primer día — está en lo que queda cuando el primer día se acaba. Tres evidencias, medibles en el repositorio:</p>
+        <span class="label eyebrow">La prueba</span>
+        <h2 id="rigor-h" class="display-md">Las tres filas de arriba no son promesas.</h2>
+        <p class="body">Pedirle código a un chat también sale barato. La diferencia no está en la velocidad del primer día, sino en lo que queda cuando ese día se acaba. Pruebas, trabajo en paralelo y repetibilidad son las tres filas que separan a los métodos, y las tres se pueden contar en el repositorio.</p>
       </div>
       <ul class="assumptions enter" style="margin-top:40px">
         <li>
-          <span class="label">72 pruebas en verde antes de la primera pantalla</span>
+          <span class="label">Pruebas · 72 en verde antes de la primera pantalla</span>
           <p class="body-sm">La constitución del proyecto exige la prueba antes que el código. Un chat sin especificación entrega la feature; nadie le pidió la prueba, así que no existe.</p>
         </li>
         <li>
-          <span class="label">Cero conflictos de merge entre tres ramas simultáneas</span>
+          <span class="label">Trabajo en paralelo · cero conflictos entre tres ramas</span>
           <p class="body-sm">Cada fase declara de qué archivos es dueña y cuáles no toca. Tres personas con tres chats sueltos habrían generado los mismos archivos tres veces.</p>
         </li>
         <li>
-          <span class="label">La app entera se reconstruye desde una carpeta vacía</span>
+          <span class="label">Repetible · la app se reconstruye desde una carpeta vacía</span>
           <p class="body-sm">El repositorio incluye el prompt de replicación con contratos, tokens de diseño y las dieciséis trampas que costaron tiempo la primera vez. Un historial de chat no se puede volver a ejecutar; una especificación sí.</p>
         </li>
       </ul>
