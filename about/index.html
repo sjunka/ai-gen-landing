@@ -216,13 +216,66 @@ a { color: inherit; }
 .response-row.ready .method { color: var(--color-primary); }
 .response-rows-poll { margin-top: 6px; }
 
-/* ── El ciclo de Spec Kit: tabla animada, comando → archivo ───────────── */
-.cycle-wrap { margin-top: 40px; overflow-x: auto; }
-.cycle-table { width: 100%; border-collapse: collapse; min-width: 640px; }
-.cycle-table th { text-align: left; font-family: var(--font-mono); font-size: 10.5px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-ink-tertiary); padding: 0 16px 12px 0; border-bottom: 1px solid var(--color-hairline-strong); }
-.cycle-table td { padding: 18px 16px 18px 0; border-bottom: 1px solid var(--color-hairline); vertical-align: top; font-size: 14px; line-height: 1.5; color: var(--color-ink-muted); }
-.cycle-table td.cmd { font-size: 13px; color: var(--color-ink); font-weight: 500; white-space: nowrap; }
-.cycle-table tr[data-focal="true"] td.cmd { color: var(--color-primary); font-weight: 700; }
+/* ── El ciclo de Spec Kit: filas que crecen para leerse ────────────────
+   Rejilla en vez de <table>: una fila de tabla no acepta transform ni
+   sombra, y aquí la fila entera tiene que poder crecer al enfocarla.
+   Los roles ARIA conservan la semántica de tabla. */
+.cycle-hint { color: var(--color-ink-tertiary); margin-top: 28px; }
+.cycle-wrap { margin-top: 12px; }
+.cycle { display: grid; gap: 2px; }
+.cycle-row {
+  position: relative; display: grid; gap: 6px; padding: 16px 14px;
+  border: 1px solid transparent; border-bottom-color: var(--color-hairline);
+  border-radius: 12px;
+  transition: background-color 200ms ease, border-color 200ms ease, box-shadow 200ms ease, opacity 200ms ease;
+}
+.cycle-row::before {
+  content: ""; position: absolute; left: 4px; top: 12px; bottom: 12px; width: 3px;
+  border-radius: 3px; background: var(--tint); opacity: 0; transition: opacity 200ms ease;
+}
+/* Apilada en una columna, la fila de encabezados quedaría como tres
+   líneas sueltas sin nada debajo que encabezar. */
+.cycle-head { display: none; }
+@media (min-width: 900px) { .cycle-head { display: grid; padding-bottom: 12px; border-bottom-color: var(--color-hairline-strong); border-radius: 0; } }
+.cycle-head span { font-family: var(--font-mono); font-size: 10.5px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-ink-tertiary); }
+.cycle-row .cmd { font-size: 13px; font-weight: 500; color: var(--color-ink); }
+.cycle-row .what { color: var(--color-ink-muted); }
+.cycle-row[data-focal="true"] .cmd { color: var(--color-primary); font-weight: 700; }
+@media (min-width: 900px) {
+  .cycle-row { grid-template-columns: 218px minmax(0, 1fr) 316px; gap: 20px; align-items: start; }
+  .cycle-row .cmd { white-space: nowrap; }
+}
+
+/* Destacado: la fila se separa del resto para poder leerla en voz alta. */
+.cycle-row:not(.cycle-head):hover,
+.cycle-row:not(.cycle-head):focus-visible,
+.cycle-row[data-hot="true"] {
+  background: var(--color-surface-2);
+  border-color: color-mix(in srgb, var(--tint) 55%, var(--color-hairline-strong));
+  box-shadow: var(--shadow-lift);
+  outline: none;
+  z-index: 1;
+}
+.cycle-row:not(.cycle-head):hover::before,
+.cycle-row:not(.cycle-head):focus-visible::before,
+.cycle-row[data-hot="true"]::before { opacity: 1; }
+.cycle-row:not(.cycle-head):hover .cmd,
+.cycle-row:not(.cycle-head):focus-visible .cmd,
+.cycle-row[data-hot="true"] .cmd { color: var(--color-ink); font-weight: 700; }
+.cycle-row:not(.cycle-head):hover .what,
+.cycle-row:not(.cycle-head):focus-visible .what,
+.cycle-row[data-hot="true"] .what { color: var(--color-ink); }
+.cycle-row:not(.cycle-head):hover .file-chip,
+.cycle-row:not(.cycle-head):focus-visible .file-chip,
+.cycle-row[data-hot="true"] .file-chip {
+  background: color-mix(in srgb, var(--tint) 26%, var(--color-surface-2));
+  border-color: color-mix(in srgb, var(--tint) 60%, var(--color-hairline-strong));
+  color: var(--color-ink);
+}
+/* Las hermanas se apagan: sólo una fila se lee a la vez. */
+.cycle:hover .cycle-row:not(.cycle-head):not(:hover),
+.cycle:focus-within .cycle-row:not(.cycle-head):not(:focus-visible):not(:hover) { opacity: 0.4; }
+
 .file-chip { display: inline-block; font-size: 12px; color: var(--color-ink-muted); background: var(--color-surface-3); border: 1px solid var(--color-hairline-strong); border-radius: 6px; padding: 5px 9px; white-space: nowrap; }
 
 /* ── Dos copias del repo ───────────────────────────────────────────────── */
@@ -847,40 +900,40 @@ a { color: inherit; }
         <p class="body">Nadie escribió <code class="mono">spec.md</code> ni <code class="mono">tasks.md</code> a mano: salieron de correr estos cinco comandos, uno detrás del otro, con Claude Code como integración. Cada uno lee lo que dejó el anterior y produce un archivo — esa es la fuente de verdad. Ábrelo en VS Code y ahí está, literal, lo que el agente usó.</p>
       </div>
 
+      <p class="caption cycle-hint" data-cycle-hint>Pasa el mouse por un comando para ampliarlo y leerlo completo.</p>
       <div class="cycle-wrap">
-        <table class="cycle-table">
-          <caption class="skip-visually">El ciclo de Spec Kit aplicado a este proyecto: comando, qué fija, y el archivo que produce</caption>
-          <thead>
-            <tr><th scope="col">Comando</th><th scope="col">Qué fija</th><th scope="col">Archivo — ábrelo en VS Code</th></tr>
-          </thead>
-          <tbody class="reveal-stagger">
-            <tr>
-              <td class="mono cmd">/speckit.constitution</td>
-              <td class="body-sm">Las reglas que no se negocian: test-first, la suite corre offline sin llaves ni red, ownership de archivos define el paralelismo.</td>
-              <td><span class="file-chip mono">.specify/memory/constitution.md</span></td>
-            </tr>
-            <tr>
-              <td class="mono cmd">/speckit.specify</td>
-              <td class="body-sm">Qué hace la app y por qué — sin una palabra de tecnología. Las 4 historias de usuario, priorizadas P1–P4.</td>
-              <td><span class="file-chip mono">specs/001-ai-media-generator/spec.md</span></td>
-            </tr>
-            <tr>
-              <td class="mono cmd">/speckit.plan</td>
-              <td class="body-sm">El stack exacto y los contratos entre fases — firmas de función, rutas HTTP — lo que deja a tres personas construir sin verse.</td>
-              <td><span class="file-chip mono">specs/001-ai-media-generator/plan.md</span></td>
-            </tr>
-            <tr>
-              <td class="mono cmd">/speckit.tasks</td>
-              <td class="body-sm">Los 39 tickets, repartidos en 5 fases. Cada fase declara qué archivos posee y cuáles nunca toca.</td>
-              <td><span class="file-chip mono">specs/001-ai-media-generator/tasks.md</span></td>
-            </tr>
-            <tr data-focal="true">
-              <td class="mono cmd">/speckit.implement fase N</td>
-              <td class="body-sm">El código real de esa fase, ticket por ticket — la prueba se escribe antes que el código que la pasa.</td>
-              <td><span class="file-chip mono">app/ · components/ · lib/</span></td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="cycle" role="table" data-cycle aria-label="El ciclo de Spec Kit aplicado a este proyecto: comando, qué fija, y el archivo que produce">
+          <div class="cycle-row cycle-head" role="row">
+            <span role="columnheader">Comando</span>
+            <span role="columnheader">Qué fija</span>
+            <span role="columnheader">Archivo — ábrelo en VS Code</span>
+          </div>
+          <div class="cycle-row" role="row" tabindex="0" style="--tint: var(--color-orb-sky)">
+            <span class="cmd mono" role="cell">/speckit.constitution</span>
+            <span class="what body-sm" role="cell">Las reglas que no se negocian: test-first, la suite corre offline sin llaves ni red, ownership de archivos define el paralelismo.</span>
+            <span class="file" role="cell"><span class="file-chip mono">.specify/memory/constitution.md</span></span>
+          </div>
+          <div class="cycle-row" role="row" tabindex="0" style="--tint: var(--color-orb-lavender)">
+            <span class="cmd mono" role="cell">/speckit.specify</span>
+            <span class="what body-sm" role="cell">Qué hace la app y por qué — sin una palabra de tecnología. Las 4 historias de usuario, priorizadas P1–P4.</span>
+            <span class="file" role="cell"><span class="file-chip mono">specs/001-ai-media-generator/spec.md</span></span>
+          </div>
+          <div class="cycle-row" role="row" tabindex="0" style="--tint: var(--color-orb-mint)">
+            <span class="cmd mono" role="cell">/speckit.plan</span>
+            <span class="what body-sm" role="cell">El stack exacto y los contratos entre fases — firmas de función, rutas HTTP — lo que deja a tres personas construir sin verse.</span>
+            <span class="file" role="cell"><span class="file-chip mono">specs/001-ai-media-generator/plan.md</span></span>
+          </div>
+          <div class="cycle-row" role="row" tabindex="0" style="--tint: var(--color-orb-peach)">
+            <span class="cmd mono" role="cell">/speckit.tasks</span>
+            <span class="what body-sm" role="cell">Los 39 tickets, repartidos en 5 fases. Cada fase declara qué archivos posee y cuáles nunca toca.</span>
+            <span class="file" role="cell"><span class="file-chip mono">specs/001-ai-media-generator/tasks.md</span></span>
+          </div>
+          <div class="cycle-row" role="row" tabindex="0" style="--tint: var(--color-orb-rose)" data-focal="true">
+            <span class="cmd mono" role="cell">/speckit.implement fase N</span>
+            <span class="what body-sm" role="cell">El código real de esa fase, ticket por ticket — la prueba se escribe antes que el código que la pasa.</span>
+            <span class="file" role="cell"><span class="file-chip mono">app/ · components/ · lib/</span></span>
+          </div>
+        </div>
       </div>
       <p class="caption section-note">Los cinco comandos están declarados en <code class="mono">.specify/workflows/speckit/workflow.yml</code> con nombre de comando en punto — <code class="mono">speckit.specify</code>, no <code class="mono">speckit-specify</code>.</p>
     </div>
@@ -1568,6 +1621,41 @@ a { color: inherit; }
         ? 'Toca una tarjeta para ver qué significa en la práctica.'
         : 'Pasa el mouse por una tarjeta para ver qué significa en la práctica.';
     }
+  }
+
+  // ── 9 · Ciclo de Spec Kit: la fila enfocada crece para leerse ────────
+  //
+  // El color, la sombra y el apagado de las hermanas los hace CSS, así que
+  // funcionan sin JS y con prefers-reduced-motion. Aquí sólo va el aumento:
+  // la fila crece desde su centro con `back.out`, y el comando se adelanta
+  // un poco para que la vista aterrice ahí primero.
+  var cycle = document.querySelector('[data-cycle]');
+  if (cycle) {
+    var cycleHint = document.querySelector('[data-cycle-hint]');
+    var noTouch = !matchMedia('(hover: none)').matches;
+    var rows = Array.prototype.slice.call(cycle.querySelectorAll('.cycle-row:not(.cycle-head)'));
+
+    rows.forEach(function (row) {
+      var grow = gsap.timeline({ paused: true })
+        .to(row, { scale: 1.035, duration: 0.42, ease: 'back.out(1.9)' }, 0)
+        .to(row.querySelector('.cmd'), { x: 5, duration: 0.38, ease: 'power2.out' }, 0);
+
+      var big = false;
+      function up() { if (big) return; big = true; row.dataset.hot = 'true'; grow.play(); }
+      function down() { if (!big) return; big = false; row.dataset.hot = 'false'; grow.reverse(); }
+
+      if (noTouch) {
+        row.addEventListener('mouseenter', up);
+        row.addEventListener('mouseleave', down);
+        row.addEventListener('focusin', up);
+        row.addEventListener('focusout', down);
+      } else {
+        // Un tap dispara también mouseenter y focusin: sólo el clic alterna.
+        row.addEventListener('click', function () { big ? down() : up(); });
+      }
+    });
+
+    if (cycleHint && !noTouch) cycleHint.textContent = 'Toca un comando para ampliarlo y leerlo completo.';
   }
 
   ScrollTrigger.refresh();
