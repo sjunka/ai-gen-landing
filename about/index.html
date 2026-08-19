@@ -1,0 +1,901 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arquitectura y método — AI Media Generator</title>
+<meta name="description" content="Diagramas de casos de uso, arquitectura, secuencia y el método de entrega en paralelo detrás de AI Media Generator: Next.js 16, Clerk, MongoDB Atlas, Vercel Blob e Higgsfield, construidos desde una especificación por 5 personas en 39 tickets.">
+<link rel="icon" href="../assets/icon-192.png" type="image/png">
+<meta name="theme-color" content="#f5f5f5">
+<link rel="canonical" href="https://sjunka.github.io/ai-gen-landing/about/">
+
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_ES">
+<meta property="og:title" content="Arquitectura y método — AI Media Generator">
+<meta property="og:description" content="Cómo funciona la app, para quien decide arquitectura: casos de uso, componentes reales, secuencia de generación y el método de entrega en paralelo.">
+<meta property="og:url" content="https://sjunka.github.io/ai-gen-landing/about/">
+<meta property="og:image" content="https://sjunka.github.io/ai-gen-landing/assets/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,300&display=swap"></noscript>
+
+<style>
+/* ── Respaldos con métricas — idénticos a la landing ──────────────────── */
+@font-face { font-family: "Inter Fallback"; src: local("Arial"), local("Helvetica"); ascent-override: 90.2%; descent-override: 22.48%; line-gap-override: 0%; size-adjust: 107.4%; }
+@font-face { font-family: "Newsreader Fallback"; src: local("Times New Roman"), local("Georgia"); ascent-override: 92%; descent-override: 24%; line-gap-override: 0%; size-adjust: 106%; }
+@font-face { font-family: "JetBrains Mono Fallback"; src: local("Menlo"), local("Consolas"), local("Courier New"); ascent-override: 102.35%; descent-override: 30.1%; line-gap-override: 0%; size-adjust: 99.66%; }
+
+/* ── Tokens — verbatim de la landing (../index.html), un solo lienzo ─── */
+:root {
+  --color-canvas: #f5f5f5;
+  --color-surface-1: #fafafa;
+  --color-surface-2: #ffffff;
+  --color-surface-3: #f0efed;
+  --color-surface-4: #e7e5e4;
+  --color-hairline: #e7e5e4;
+  --color-hairline-strong: #d6d3d1;
+  --color-ink: #0c0a09;
+  --color-ink-muted: #4e4e4e;
+  --color-ink-subtle: #777169;
+  --color-ink-tertiary: #a8a29e;
+  --color-primary: #292524;
+  --color-primary-hover: #0c0a09;
+  --color-on-primary: #ffffff;
+  --color-success: #16a34a;
+
+  --color-orb-mint: #a7e5d3;
+  --color-orb-peach: #f4c5a8;
+  --color-orb-lavender: #c8b8e0;
+  --color-orb-sky: #a8c8e8;
+  --color-orb-rose: #e8b8c8;
+
+  --font-display: "Newsreader", "Newsreader Fallback", "Times New Roman", Georgia, serif;
+  --font-sans: "Inter", "Inter Fallback", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", "JetBrains Mono Fallback", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+  --gap: 24px;
+  --shell: 1180px;
+  --section: 96px;
+  --shadow-soft: 0 4px 16px rgba(12, 10, 9, 0.04);
+  --shadow-lift: 0 18px 48px rgba(12, 10, 9, 0.10);
+
+  /* ── Paleta de diagramas: deriva de los tokens de arriba, no inventa color nuevo ── */
+  --dg-ink: var(--color-ink);
+  --dg-muted: var(--color-ink-muted);
+  --dg-soft: var(--color-ink-subtle);
+  --dg-hair: var(--color-hairline-strong);
+  --dg-hair-soft: var(--color-hairline);
+  --dg-paper: var(--color-canvas);
+  --dg-surface: var(--color-surface-2);
+  --dg-accent: var(--color-primary);
+  --dg-accent-soft: #dde9f4;
+  --dg-blue: #4f76a0;
+  --dg-blue-soft: #eaf1f8;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body { margin: 0; background: var(--color-canvas); color: var(--color-ink-muted); font-family: var(--font-sans); font-size: 16px; line-height: 1.5; letter-spacing: 0.16px; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+h1, h2, h3, p, ul, ol, figure, dl { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+img, video, svg { display: block; max-width: 100%; }
+img, video { height: auto; }
+a { color: inherit; }
+::selection { background: var(--color-orb-mint); color: var(--color-ink); }
+* { scrollbar-color: var(--color-hairline-strong) transparent; }
+:where(a, button, summary, [tabindex]):focus-visible { outline: 2px solid var(--color-ink); outline-offset: 3px; border-radius: 4px; }
+
+.shell { width: 100%; max-width: var(--shell); margin-inline: auto; padding-inline: var(--gap); }
+.skip { position: absolute; left: var(--gap); top: -100px; z-index: 10; background: var(--color-surface-2); color: var(--color-ink); border: 1px solid var(--color-hairline-strong); border-radius: 9999px; padding: 12px 20px; min-height: 44px; display: inline-flex; align-items: center; box-shadow: var(--shadow-soft); }
+.skip:focus { top: 12px; }
+
+.display-xl { font-family: var(--font-display); font-size: clamp(38px, 5vw + 18px, 68px); font-weight: 300; line-height: 1.05; letter-spacing: -0.036em; color: var(--color-ink); }
+.display-lg { font-family: var(--font-display); font-size: clamp(30px, 3vw + 16px, 48px); font-weight: 300; line-height: 1.1; letter-spacing: -0.04em; color: var(--color-ink); }
+.display-md { font-family: var(--font-display); font-size: clamp(26px, 2vw + 15px, 36px); font-weight: 300; line-height: 1.16; letter-spacing: -0.03em; color: var(--color-ink); }
+.heading-xl { font-size: 22px; font-weight: 500; line-height: 1.28; letter-spacing: -0.2px; color: var(--color-ink); }
+.heading { font-size: 18px; font-weight: 500; line-height: 1.35; color: var(--color-ink); }
+.body { font-size: 16px; font-weight: 400; line-height: 1.55; letter-spacing: 0.16px; }
+.body-sm { font-size: 15px; font-weight: 400; line-height: 1.5; letter-spacing: 0.15px; }
+.caption { font-size: 14px; font-weight: 400; line-height: 1.5; }
+.label { font-size: 12px; font-weight: 600; line-height: 1.4; letter-spacing: 0.96px; text-transform: uppercase; }
+.mono { font-family: var(--font-mono); font-weight: 400; line-height: 1.5; font-variant-numeric: tabular-nums; }
+.muted { color: var(--color-ink-muted); }
+.subtle { color: var(--color-ink-subtle); }
+.tertiary { color: var(--color-ink-tertiary); }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 22px; border-radius: 9999px; border: 1px solid transparent; font: 500 15px/1 var(--font-sans); text-decoration: none; transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease, transform 140ms ease; }
+.btn-primary { background: var(--color-primary); color: var(--color-on-primary); }
+.btn-primary:hover { background: var(--color-primary-hover); }
+.btn-primary:active { transform: translateY(1px); }
+.btn-tertiary { background: transparent; color: var(--color-ink); border-color: var(--color-hairline-strong); }
+.btn-tertiary:hover { border-color: var(--color-ink); }
+.link-inline { color: var(--color-ink); text-decoration: none; border-bottom: 1px solid var(--color-hairline-strong); padding-bottom: 1px; transition: border-color 140ms ease; }
+.link-inline:hover { border-bottom-color: var(--color-ink); }
+
+.topbar { border-bottom: 1px solid var(--color-hairline); background: color-mix(in srgb, var(--color-canvas) 88%, transparent); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 5; }
+.topbar > .shell { display: flex; align-items: center; gap: 16px; min-height: 64px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 500; font-size: 15px; color: var(--color-ink); margin-right: auto; }
+.brand-mark { width: 20px; height: 20px; flex: none; color: var(--color-ink); }
+.topbar .navlink { display: none; }
+.eyebrow-pill { display: inline-flex; align-items: center; gap: 6px; border-radius: 9999px; padding: 5px 11px; background: var(--color-surface-3); color: var(--color-ink-subtle); }
+
+.section { padding-block: var(--section); }
+.section + .section { border-top: 1px solid var(--color-hairline); }
+.section-head { max-width: 62ch; }
+.section-head h2 { margin-bottom: 14px; text-wrap: balance; }
+.section-head .label { color: var(--color-ink-tertiary); margin-bottom: 12px; display: block; }
+.section-note { max-width: 62ch; margin-top: 20px; }
+
+/* ── Héroe ─────────────────────────────────────────────────────────── */
+.hero { position: relative; padding-block: 64px 72px; overflow: clip; }
+.hero-orbs { position: absolute; inset: 0; pointer-events: none; overflow: clip; }
+.hero-orbs span { position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.5; }
+.hero-orbs span:nth-child(1) { width: 420px; height: 420px; left: -110px; top: -80px; background: radial-gradient(circle, var(--color-orb-sky), transparent 68%); }
+.hero-orbs span:nth-child(2) { width: 460px; height: 460px; right: -140px; top: 0; background: radial-gradient(circle, var(--color-orb-lavender), transparent 68%); }
+.hero-orbs span:nth-child(3) { width: 360px; height: 360px; left: 38%; top: 260px; background: radial-gradient(circle, var(--color-orb-mint), transparent 68%); }
+.hero > .shell { position: relative; }
+.hero h1 { max-width: 18ch; margin-bottom: 20px; text-wrap: balance; }
+.hero-sub { max-width: 60ch; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+
+.stats { border-block: 1px solid var(--color-hairline); padding-block: 40px; background: var(--color-surface-1); }
+.stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px 24px; }
+.stats-grid dt { color: var(--color-ink); font-variant-numeric: tabular-nums; }
+.stats-grid dd { margin: 4px 0 0; color: var(--color-ink-subtle); }
+.stats-foot { margin-top: 28px; color: var(--color-ink-subtle); }
+
+/* ── Diagramas: sobre el lienzo, sin tarjeta ──────────────────────────── */
+.dg-wrap { margin-top: 40px; overflow-x: auto; }
+.dg-wrap svg { width: 100%; height: auto; min-width: 560px; display: block; }
+.dg text { font-family: var(--font-sans); }
+.dg .mono { font-family: var(--font-mono); }
+.dg-legend { display: flex; flex-wrap: wrap; gap: 18px 28px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--color-hairline); }
+.dg-legend-item { display: flex; align-items: center; gap: 8px; }
+.dg-legend-item .caption { color: var(--color-ink-subtle); }
+.dg-swatch { width: 22px; height: 2px; flex: none; }
+.dg-swatch.solid { background: var(--dg-muted); }
+.dg-swatch.solid.accent { background: var(--dg-blue); height: 2.5px; }
+.dg-swatch.dashed { background: repeating-linear-gradient(90deg, var(--dg-muted) 0 5px, transparent 5px 9px); }
+.dg-dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.dg-dot.node { background: var(--color-surface-2); border: 1.5px solid var(--dg-ink); }
+.dg-dot.focal { background: var(--dg-accent-soft); border: 1.5px solid var(--dg-accent); }
+.dg-dot.ext { background: var(--dg-hair-soft); border: 1.5px solid var(--dg-soft); }
+
+.tech-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 28px 36px; margin-top: 44px; padding-top: 28px; border-top: 1px solid var(--color-hairline); }
+.tech-item { display: flex; align-items: center; gap: 10px; }
+.tech-item img { width: 22px; height: 22px; object-fit: contain; }
+.tech-item .logo-chip { width: auto; height: 22px; padding: 0 8px; border-radius: 4px; border: 1px solid var(--color-hairline-strong); display: inline-flex; align-items: center; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; color: var(--color-ink-muted); }
+.tech-item span { font-size: 14px; color: var(--color-ink-muted); }
+.tech-item b { color: var(--color-ink); font-weight: 500; }
+
+.callout { margin-top: 28px; padding-left: 16px; border-left: 2px solid var(--color-hairline-strong); }
+.callout p { font-family: var(--font-display); font-style: italic; font-size: 17px; line-height: 1.5; color: var(--color-ink-muted); max-width: 58ch; }
+
+/* ── El método: tarjetas Owns / Never touches ─────────────────────────── */
+.owns-grid { display: grid; gap: 16px; margin-top: 40px; }
+.owns-card { background: var(--color-surface-2); border: 1px solid var(--color-hairline); border-radius: 12px; padding: 20px; box-shadow: var(--shadow-soft); }
+.owns-card header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.owns-card h3 { font-size: 15px; font-weight: 500; color: var(--color-ink); }
+.owns-card .branch { font-family: var(--font-mono); font-size: 11px; color: var(--color-ink-tertiary); }
+.owns-card dl { display: grid; gap: 6px; }
+.owns-card dt { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-ink-tertiary); }
+.owns-card dd { font-size: 13px; line-height: 1.5; color: var(--color-ink-muted); margin: 2px 0 0; }
+.owns-card dd.never { color: var(--color-ink-subtle); }
+.owns-card[data-focal="true"] { border-color: var(--color-ink); }
+
+/* ── Por qué le importa a un líder TI ──────────────────────────────────── */
+.leader-grid { display: grid; gap: 16px; margin-top: 40px; }
+.leader-card { background: var(--color-surface-2); border: 1px solid var(--color-hairline); border-radius: 12px; padding: 22px; }
+.leader-card .n { font-family: var(--font-mono); font-size: 11px; color: var(--color-ink-tertiary); display: block; margin-bottom: 10px; }
+.leader-card h3 { margin-bottom: 8px; }
+.leader-card p { max-width: 42ch; }
+.leader-card .ref { display: inline-block; margin-top: 12px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.05em; color: var(--color-ink-tertiary); border: 1px solid var(--color-hairline-strong); border-radius: 4px; padding: 2px 6px; }
+
+.closing { position: relative; padding-block: var(--section); text-align: center; overflow: clip; }
+.closing::before { content: ""; position: absolute; left: 50%; top: 10%; width: 560px; height: 560px; transform: translateX(-50%); border-radius: 50%; filter: blur(80px); opacity: 0.45; background: radial-gradient(circle, var(--color-orb-peach), transparent 66%); pointer-events: none; }
+.closing > .shell { position: relative; }
+.closing h2 { margin-bottom: 24px; max-width: 20ch; margin-inline: auto; }
+.closing-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.closing .caption { margin-top: 22px; color: var(--color-ink-subtle); }
+
+.foot { padding-block: 56px 44px; border-top: 1px solid var(--color-hairline); }
+.foot-cols { display: grid; gap: 32px; }
+.foot h2 { font-size: 12px; font-weight: 600; line-height: 1.4; letter-spacing: 0.96px; text-transform: uppercase; color: var(--color-ink-tertiary); margin-bottom: 12px; }
+.foot li + li { margin-top: 2px; }
+.foot a { display: inline-flex; align-items: center; min-height: 40px; font-size: 15px; line-height: 1.47; color: var(--color-ink-muted); text-decoration: none; transition: color 140ms ease; }
+.foot a:hover { color: var(--color-ink); }
+.foot-team { font-size: 15px; line-height: 1.47; color: var(--color-ink-muted); }
+.foot-team li { min-height: 0; margin-top: 6px; }
+
+/* ── Motion: estado inicial visible sin JS; JS solo añade entrada ────── */
+.reveal, .reveal-stagger > * { opacity: 1; }
+.js .reveal { opacity: 0; }
+.js .reveal-stagger > * { opacity: 0; }
+
+@media (min-width: 640px) {
+  .stats-grid { grid-template-columns: repeat(3, 1fr); }
+  .foot-cols { grid-template-columns: repeat(3, 1fr); }
+  .owns-grid { grid-template-columns: repeat(2, 1fr); }
+  .leader-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (min-width: 768px) {
+  .topbar .navlink { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding-inline: 10px; text-decoration: none; font-size: 15px; font-weight: 500; color: var(--color-ink-subtle); transition: color 140ms ease; }
+  .topbar .navlink:hover { color: var(--color-ink); }
+}
+@media (min-width: 1024px) {
+  :root { --section: 128px; }
+  .stats-grid { grid-template-columns: repeat(5, 1fr); }
+  .owns-grid { grid-template-columns: repeat(5, 1fr); }
+  .leader-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .reveal, .reveal-stagger > * { opacity: 1 !important; transform: none !important; }
+}
+</style>
+</head>
+
+<body>
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<header class="topbar">
+  <div class="shell">
+    <a class="brand" href="../">
+      <svg class="brand-mark" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+        <rect x="3" y="4" width="14" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/>
+        <circle cx="7.5" cy="8" r="1.25" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M3 13.5l3.5-3 3 2.5 2.5-2 4 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      AI Media Generator
+    </a>
+    <a class="navlink" href="../">Landing</a>
+    <a class="navlink" href="https://github.com/sjunka/speckit-ai-generator">GitHub</a>
+    <a class="btn btn-primary" href="https://ia-generator-openspec.vercel.app/">Probar la app</a>
+  </div>
+</header>
+
+<main id="contenido">
+
+  <!-- ── 1 · Héroe ──────────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="hero-orbs" aria-hidden="true"><span></span><span></span><span></span></div>
+    <div class="shell">
+      <span class="eyebrow-pill label" data-hero-el>Para liderazgo técnico</span>
+      <h1 class="display-xl" style="margin-top:20px" data-hero-el>Cómo funciona, de arriba abajo.</h1>
+      <p class="body hero-sub" data-hero-el>Esta página acompaña la presentación. Mismo producto que <a class="link-inline" href="../">la landing</a>, explicado para quien decide arquitectura: casos de uso, componentes reales, la secuencia de una generación y el método con el que cinco personas lo construyeron en paralelo sin pisarse.</p>
+      <div class="hero-actions" data-hero-el>
+        <a class="btn btn-tertiary" href="#casos-de-uso">Casos de uso</a>
+        <a class="btn btn-tertiary" href="#arquitectura">Arquitectura</a>
+        <a class="btn btn-tertiary" href="#secuencia">Secuencia</a>
+        <a class="btn btn-tertiary" href="#metodo">El método</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 2 · Franja de números ─────────────────────────────────────── -->
+  <section class="stats" aria-labelledby="stats-h">
+    <div class="shell">
+      <h2 id="stats-h" class="label" style="margin-bottom:4px">El repositorio, en cifras</h2>
+      <dl class="stats-grid" style="margin-top:24px">
+        <div><dt class="display-md" data-count="39">0</dt><dd class="caption">tickets</dd></div>
+        <div><dt class="display-md" data-count="5">0</dt><dd class="caption">fases</dd></div>
+        <div><dt class="display-md" data-count="5">0</dt><dd class="caption">personas</dd></div>
+        <div><dt class="display-md" data-count="3">0</dt><dd class="caption">ramas en paralelo</dd></div>
+        <div><dt class="display-md" data-count="1">0</dt><dd class="caption">proveedor de IA</dd></div>
+      </dl>
+      <p class="caption stats-foot">Next.js 16.3 · React 19.2 · Tailwind v4 · Clerk 7 · MongoDB driver 7 · Vercel Blob 2 · Higgsfield. Versiones exactas de <code class="mono">package.json</code>.</p>
+    </div>
+  </section>
+
+  <!-- ── 3 · Casos de uso (UML) ────────────────────────────────────── -->
+  <section class="section" id="casos-de-uso" aria-labelledby="uc-h">
+    <div class="shell">
+      <div class="section-head reveal">
+        <span class="label">UML · Diagrama de casos de uso</span>
+        <h2 id="uc-h" class="display-md">Cuatro actores, ocho capacidades.</h2>
+        <p class="body">Un visitante se convierte en usuario al iniciar sesión. El dueño es también un usuario, con tres capacidades extra. Higgsfield es un actor externo: el sistema le delega la generación, nunca la simula.</p>
+      </div>
+
+      <div class="dg-wrap">
+        <svg class="dg" data-diagram="true" viewBox="0 0 760 520" role="img" aria-labelledby="uc-t uc-d">
+          <title id="uc-t">Diagrama de casos de uso de AI Media Generator</title>
+          <desc id="uc-d">Cuatro actores — Visitante, Usuario, Dueño e Higgsfield AI — y ocho casos de uso dentro del sistema: iniciar sesión, tomar o subir foto, generar imagen, convertir en video, descargar y compartir, ver panel del dueño, pausar generación y elegir calidad de video. El Dueño es una especialización de Usuario, y dos extensiones marcan que pausar y elegir calidad modifican la generación.</desc>
+          <defs>
+            <marker id="uc-arrow-open" markerWidth="9" markerHeight="8" refX="7" refY="4" orient="auto">
+              <path d="M0 0 L8 4 L0 8" fill="none" stroke="var(--dg-ink)" stroke-width="1.3"/>
+            </marker>
+          </defs>
+          <rect width="100%" height="100%" fill="var(--dg-paper)"/>
+
+          <!-- Frontera del sistema -->
+          <rect x="150" y="30" width="520" height="382" rx="12" fill="var(--dg-surface)" stroke="var(--dg-hair)" stroke-width="1"/>
+          <rect x="166" y="16" width="200" height="20" fill="var(--dg-paper)"/>
+          <text x="166" y="30" class="mono" font-size="10" letter-spacing="0.12em" fill="var(--dg-soft)">AI MEDIA GENERATOR</text>
+
+          <!-- ── Líneas de asociación (trazo antes que nodos) ── -->
+          <g class="dg-line" stroke="var(--dg-muted)" stroke-width="1" fill="none">
+            <!-- Visitante -->
+            <line x1="76" y1="90" x2="168" y2="90"/>
+            <!-- Usuario -->
+            <line x1="76" y1="212" x2="168" y2="170"/>
+            <line x1="76" y1="212" x2="168" y2="250"/>
+            <line x1="76" y1="212" x2="448" y2="90"/>
+            <line x1="76" y1="212" x2="448" y2="170"/>
+            <!-- Dueño -->
+            <line x1="76" y1="352" x2="168" y2="330"/>
+            <line x1="76" y1="352" x2="448" y2="250"/>
+            <line x1="76" y1="352" x2="448" y2="330"/>
+            <!-- Higgsfield -->
+            <line x1="686" y1="130" x2="612" y2="90"/>
+            <line x1="686" y1="130" x2="612" y2="170"/>
+          </g>
+
+          <!-- Generalización: Dueño ▷ Usuario -->
+          <path class="dg-line" d="M100,335 V222" fill="none" stroke="var(--dg-ink)" stroke-width="1.1" marker-end="url(#uc-arrow-open)"/>
+
+          <!-- «extend»: Pausar → Generar imagen IA · Elegir calidad → Convertir en video -->
+          <g class="dg-line" fill="none" stroke="var(--dg-muted)" stroke-width="1" stroke-dasharray="4,3">
+            <path d="M612,250 H634 Q642,250 642,242 V98 Q642,90 634,90 H612" marker-end="url(#uc-arrow-open)"/>
+            <path d="M612,330 H656 Q664,330 664,322 V178 Q664,170 656,170 H612" marker-end="url(#uc-arrow-open)"/>
+          </g>
+          <rect x="605" y="112" width="62" height="13" fill="var(--dg-paper)"/>
+          <text x="636" y="122" class="mono" font-size="8" text-anchor="middle" fill="var(--dg-soft)">«extend»</text>
+          <rect x="627" y="244" width="62" height="13" fill="var(--dg-paper)"/>
+          <text x="658" y="254" class="mono" font-size="8" text-anchor="middle" fill="var(--dg-soft)">«extend»</text>
+
+          <!-- ── Actores ── -->
+          <g class="dg-node" stroke="var(--dg-ink)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <g transform="translate(44,66) scale(1.3)"><path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"/><path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/></g>
+            <g transform="translate(44,188) scale(1.3)"><path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"/><path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2"/></g>
+            <g transform="translate(44,328) scale(1.3)"><path d="M6 21v-2a4 4 0 0 1 4 -4h2"/><path d="M22 16c0 4 -2.5 6 -3.5 6s-3.5 -2 -3.5 -6c1 0 2.5 -.5 3.5 -1.5c1 1 2.5 1.5 3.5 1.5"/><path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0"/></g>
+            <g transform="translate(674,108) scale(1.3)"><path d="M6 6a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v4a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2l0 -4"/><path d="M12 2v2"/><path d="M9 12v9"/><path d="M15 12v9"/><path d="M5 16l4 -2"/><path d="M15 14l4 2"/><path d="M9 18h6"/></g>
+          </g>
+          <g class="dg-node" text-anchor="middle" fill="var(--dg-ink)" font-size="12" font-weight="600">
+            <text x="60" y="106">Visitante</text>
+            <text x="60" y="228">Usuario</text>
+            <text x="60" y="368">Dueño</text>
+            <text x="700" y="146">Higgsfield</text>
+            <text x="700" y="160" font-size="9" font-weight="400" fill="var(--dg-soft)">actor externo</text>
+          </g>
+
+          <!-- ── Casos de uso (elipses) ── -->
+          <g class="dg-node">
+            <g><ellipse cx="250" cy="90" rx="82" ry="27" fill="var(--dg-paper)" stroke="var(--dg-ink)" stroke-width="1"/><text x="250" y="94" text-anchor="middle" font-size="11.5" font-weight="500" fill="var(--dg-ink)">Iniciar sesión</text></g>
+            <g><ellipse cx="250" cy="170" rx="82" ry="27" fill="var(--dg-paper)" stroke="var(--dg-ink)" stroke-width="1"/><text x="250" y="167" text-anchor="middle" font-size="11.5" font-weight="500" fill="var(--dg-ink)">Tomar / subir</text><text x="250" y="181" text-anchor="middle" font-size="11.5" font-weight="500" fill="var(--dg-ink)">foto</text></g>
+            <g><ellipse cx="250" cy="250" rx="82" ry="27" fill="var(--dg-paper)" stroke="var(--dg-ink)" stroke-width="1"/><text x="250" y="247" text-anchor="middle" font-size="11.5" font-weight="500" fill="var(--dg-ink)">Descargar y</text><text x="250" y="261" text-anchor="middle" font-size="11.5" font-weight="500" fill="var(--dg-ink)">compartir</text></g>
+            <g><ellipse cx="250" cy="330" rx="82" ry="27" fill="var(--dg-paper)" stroke="var(--dg-ink)" stroke-width="1"/><text x="250" y="327" text-anchor="middle" font-size="11.5" font-weight="500" fill="var(--dg-ink)">Ver panel del</text><text x="250" y="341" text-anchor="middle" font-size="11.5" font-weight="500" fill="var(--dg-ink)">dueño</text></g>
+
+            <g><ellipse cx="530" cy="90" rx="82" ry="27" fill="var(--dg-accent-soft)" stroke="var(--dg-accent)" stroke-width="1.4"/><text x="530" y="87" text-anchor="middle" font-size="11.5" font-weight="600" fill="var(--dg-ink)">Generar imagen</text><text x="530" y="101" text-anchor="middle" font-size="11.5" font-weight="600" fill="var(--dg-ink)">IA</text></g>
+            <g><ellipse cx="530" cy="170" rx="82" ry="27" fill="var(--dg-accent-soft)" stroke="var(--dg-accent)" stroke-width="1.4"/><text x="530" y="167" text-anchor="middle" font-size="11.5" font-weight="600" fill="var(--dg-ink)">Convertir en</text><text x="530" y="181" text-anchor="middle" font-size="11.5" font-weight="600" fill="var(--dg-ink)">video</text></g>
+            <g><ellipse cx="530" cy="250" rx="82" ry="27" fill="var(--dg-paper)" stroke="var(--dg-ink)" stroke-width="1"/><text x="530" y="247" text-anchor="middle" font-size="11.5" font-weight="500" fill="var(--dg-ink)">Pausar</text><text x="530" y="261" text-anchor="middle" font-size="11.5" font-weight="500" fill="var(--dg-ink)">generación</text></g>
+            <g><ellipse cx="530" cy="330" rx="82" ry="27" fill="var(--dg-paper)" stroke="var(--dg-ink)" stroke-width="1"/><text x="530" y="327" text-anchor="middle" font-size="11.5" font-weight="500" fill="var(--dg-ink)">Elegir calidad</text><text x="530" y="341" text-anchor="middle" font-size="11.5" font-weight="500" fill="var(--dg-ink)">de video</text></g>
+          </g>
+
+          <!-- Leyenda -->
+          <line x1="150" y1="432" x2="670" y2="432" stroke="var(--dg-hair-soft)" stroke-width="1"/>
+          <g class="mono" font-size="9" fill="var(--dg-soft)">
+            <text x="150" y="452">— asociación</text>
+            <text x="260" y="452">┄ «extend» (modifica)</text>
+            <text x="440" y="452">▷ generalización (es-un)</text>
+            <text x="150" y="470" fill="var(--dg-ink)">■ coral = habla con Higgsfield</text>
+          </g>
+        </svg>
+      </div>
+      <div class="dg-legend">
+        <div class="dg-legend-item"><span class="dg-dot node"></span><span class="caption">Caso de uso interno</span></div>
+        <div class="dg-legend-item"><span class="dg-dot focal"></span><span class="caption">Llama al proveedor de IA</span></div>
+        <div class="dg-legend-item"><span class="dg-swatch solid"></span><span class="caption">Asociación actor–caso de uso</span></div>
+        <div class="dg-legend-item"><span class="dg-swatch dashed"></span><span class="caption">«extend» / generalización</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 4 · Arquitectura ─────────────────────────────────────────── -->
+  <section class="section" id="arquitectura" aria-labelledby="arch-h">
+    <div class="shell">
+      <div class="section-head reveal">
+        <span class="label">Arquitectura de componentes</span>
+        <h2 id="arch-h" class="display-md">Una aplicación Next.js, cuatro servicios gestionados.</h2>
+        <p class="body">No hay backend separado: las rutas de API viven dentro del mismo proyecto Next.js y se despliegan juntas en Vercel. Cuatro integraciones externas, cada una con un contrato fijado en <code class="mono">plan.md</code> antes de escribir código.</p>
+      </div>
+
+      <div class="dg-wrap">
+        <svg class="dg" data-diagram="true" viewBox="0 0 720 470" role="img" aria-labelledby="ar-t ar-d">
+          <title id="ar-t">Arquitectura de componentes de AI Media Generator</title>
+          <desc id="ar-d">El cliente móvil habla por HTTPS con la aplicación Next.js 16, que expone pantallas y rutas de API en un mismo despliegue de Vercel. Next.js llama a Clerk para sesión, a MongoDB Atlas para datos, a Vercel Blob para binarios, y a Higgsfield como único proveedor de generación de imagen y video.</desc>
+          <defs>
+            <marker id="ar-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="var(--dg-muted)"/></marker>
+            <marker id="ar-arrow-blue" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="var(--dg-blue)"/></marker>
+          </defs>
+          <rect width="100%" height="100%" fill="var(--dg-paper)"/>
+
+          <!-- Zona: plataforma Vercel -->
+          <rect x="24" y="106" width="672" height="150" rx="10" fill="rgba(12,10,9,0.02)" stroke="var(--dg-hair-soft)" stroke-width="0.8"/>
+          <rect x="36" y="112" width="130" height="14" fill="var(--dg-paper)"/>
+          <text x="40" y="123" class="mono" font-size="8" letter-spacing="0.12em" fill="var(--dg-soft)">PLATAFORMA · VERCEL</text>
+
+          <!-- Conectores (antes que nodos) -->
+          <g class="dg-line" fill="none">
+            <path d="M300,86 V148" stroke="var(--dg-blue)" stroke-width="1.4" marker-end="url(#ar-arrow-blue)"/>
+            <path d="M232,224 V254 Q232,262 224,262 H180 Q172,262 172,270 V332" stroke="var(--dg-muted)" stroke-width="1.1" marker-end="url(#ar-arrow)"/>
+            <path d="M300,224 V376" stroke="var(--dg-muted)" stroke-width="1.1" marker-end="url(#ar-arrow)"/>
+            <path d="M368,224 V254 Q368,262 376,262 H420 Q428,262 428,270 V332" stroke="var(--dg-muted)" stroke-width="1.1" marker-end="url(#ar-arrow)"/>
+            <path d="M368,200 H584 Q592,200 592,208 V332" stroke="var(--dg-accent)" stroke-width="1.5" marker-end="url(#ar-arrow)"/>
+          </g>
+
+          <!-- Cliente -->
+          <g class="dg-node">
+            <rect x="220" y="20" width="160" height="66" rx="8" fill="var(--dg-surface)" stroke="var(--dg-soft)" stroke-width="1"/>
+            <g stroke="var(--dg-ink)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round" transform="translate(232,34) scale(1.5)"><path d="M6 5a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2v-14"/><path d="M12 17v.01"/></g>
+            <text x="270" y="52" font-size="12" font-weight="600" fill="var(--dg-ink)">Cliente</text>
+            <text x="270" y="68" class="mono" font-size="9" fill="var(--dg-soft)">PWA · 360px</text>
+          </g>
+
+          <!-- Next.js focal -->
+          <g class="dg-node">
+            <rect x="200" y="150" width="200" height="74" rx="8" fill="var(--dg-accent-soft)" stroke="var(--dg-accent)" stroke-width="1.6"/>
+            <image href="../assets/about/logos/nextdotjs.svg" x="216" y="166" width="22" height="22"/>
+            <text x="248" y="182" font-size="13" font-weight="600" fill="var(--dg-ink)">Next.js 16</text>
+            <text x="248" y="197" class="mono" font-size="9" fill="var(--dg-muted)">App Router · Turbopack</text>
+            <text x="248" y="210" class="mono" font-size="9" fill="var(--dg-muted)">pantallas + /api/*</text>
+          </g>
+
+          <!-- Servicios -->
+          <g class="dg-node">
+            <rect x="102" y="332" width="140" height="80" rx="8" fill="var(--dg-surface)" stroke="var(--dg-ink)" stroke-width="1"/>
+            <image href="../assets/about/logos/clerk.svg" x="116" y="346" width="20" height="20"/>
+            <text x="144" y="362" font-size="11.5" font-weight="600" fill="var(--dg-ink)">Clerk</text>
+            <text x="116" y="380" class="mono" font-size="8.5" fill="var(--dg-soft)">sesión · Google</text>
+            <text x="116" y="392" class="mono" font-size="8.5" fill="var(--dg-soft)">y email hospedados</text>
+          </g>
+          <g class="dg-node">
+            <rect x="256" y="332" width="140" height="80" rx="8" fill="var(--dg-surface)" stroke="var(--dg-ink)" stroke-width="1"/>
+            <image href="../assets/about/logos/mongodb.svg" x="270" y="346" width="20" height="20"/>
+            <text x="298" y="362" font-size="11.5" font-weight="600" fill="var(--dg-ink)">MongoDB Atlas</text>
+            <text x="270" y="380" class="mono" font-size="8.5" fill="var(--dg-soft)">generations,</text>
+            <text x="270" y="392" class="mono" font-size="8.5" fill="var(--dg-soft)">settings</text>
+          </g>
+          <g class="dg-node">
+            <rect x="410" y="332" width="140" height="80" rx="8" fill="var(--dg-surface)" stroke="var(--dg-ink)" stroke-width="1"/>
+            <image href="../assets/about/logos/vercel.svg" x="424" y="348" width="18" height="18"/>
+            <text x="452" y="362" font-size="11.5" font-weight="600" fill="var(--dg-ink)">Vercel Blob</text>
+            <text x="424" y="380" class="mono" font-size="8.5" fill="var(--dg-soft)">foto + imagen</text>
+            <text x="424" y="392" class="mono" font-size="8.5" fill="var(--dg-soft)">+ video, binarios</text>
+          </g>
+          <g class="dg-node">
+            <rect x="522" y="332" width="150" height="80" rx="8" fill="var(--dg-accent-soft)" stroke="var(--dg-accent)" stroke-width="1.4"/>
+            <text x="536" y="360" font-size="12" font-weight="700" fill="var(--dg-ink)">Higgsfield</text>
+            <text x="536" y="378" class="mono" font-size="8.5" fill="var(--dg-muted)">único proveedor:</text>
+            <text x="536" y="390" class="mono" font-size="8.5" fill="var(--dg-muted)">soul · dop lite/std/turbo</text>
+            <text x="536" y="402" class="mono" font-size="8.5" fill="var(--dg-muted)">imagen y video</text>
+          </g>
+
+          <!-- Etiquetas de conectores -->
+          <rect x="277" y="112" width="46" height="12" fill="var(--dg-paper)"/>
+          <text x="300" y="121" class="mono" font-size="8" text-anchor="middle" fill="var(--dg-blue)">HTTPS</text>
+          <rect x="440" y="285" width="80" height="12" fill="var(--dg-paper)"/>
+          <text x="480" y="294" class="mono" font-size="8" text-anchor="middle" fill="var(--dg-accent)">generar</text>
+
+          <line x1="24" y1="440" x2="696" y2="440" stroke="var(--dg-hair-soft)" stroke-width="1"/>
+          <g class="mono" font-size="9" fill="var(--dg-soft)">
+            <text x="24" y="458">— llamada síncrona</text>
+            <text x="180" y="458" fill="var(--dg-blue)">— tráfico de cliente</text>
+            <text x="360" y="458" fill="var(--dg-accent)">— proveedor de IA (foco)</text>
+          </g>
+        </svg>
+      </div>
+      <div class="dg-legend">
+        <div class="dg-legend-item"><span class="dg-dot node"></span><span class="caption">Servicio gestionado, contrato en <code class="mono">plan.md</code></span></div>
+        <div class="dg-legend-item"><span class="dg-dot focal"></span><span class="caption">Integración foco: un solo proveedor de IA</span></div>
+      </div>
+
+      <div class="tech-strip reveal-stagger">
+        <div class="tech-item"><img src="../assets/about/logos/nextdotjs.svg" alt="" loading="lazy"><span><b>Next.js</b> 16.3</span></div>
+        <div class="tech-item"><img src="../assets/about/logos/clerk.svg" alt="" loading="lazy"><span><b>Clerk</b> 7</span></div>
+        <div class="tech-item"><img src="../assets/about/logos/mongodb.svg" alt="" loading="lazy"><span><b>MongoDB</b> driver 7</span></div>
+        <div class="tech-item"><img src="../assets/about/logos/vercel.svg" alt="" loading="lazy"><span><b>Vercel</b> Blob 2</span></div>
+        <div class="tech-item"><span class="logo-chip">AI</span><span><b>Higgsfield</b></span></div>
+        <div class="tech-item"><img src="../assets/about/logos/github.svg" alt="" loading="lazy"><span><b>GitHub</b> Spec Kit</span></div>
+        <div class="tech-item"><img src="../assets/about/logos/anthropic.svg" alt="" loading="lazy"><span><b>Claude Code</b> construye</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 5 · Secuencia ─────────────────────────────────────────────── -->
+  <section class="section" id="secuencia" aria-labelledby="seq-h">
+    <div class="shell">
+      <div class="section-head reveal">
+        <span class="label">UML · Diagrama de secuencia</span>
+        <h2 id="seq-h" class="display-md">Este es el diagrama de barritas.</h2>
+        <p class="body">Cada columna es una <b class="muted">lifeline</b>: la vida de un actor en el tiempo, de arriba abajo. El rectángulo angosto sobre la línea es la <b class="muted">activation bar</b> — cuándo ese actor tiene el control. Haz scroll: los mensajes se activan paso a paso, en el orden real en que ocurren.</p>
+      </div>
+
+      <div class="dg-wrap">
+        <svg class="dg" data-sequence="true" viewBox="0 0 640 640" role="img" aria-labelledby="sq-t sq-d">
+          <title id="sq-t">Diagrama de secuencia: de una foto a un video</title>
+          <desc id="sq-d">El usuario envía la foto y un ánimo a Next.js, que llama a Higgsfield y devuelve la imagen generada. El usuario pide convertirla en video; Next.js inicia el trabajo en Higgsfield y devuelve un identificador. El cliente consulta el estado cada tres segundos, en un bucle, hasta que el video queda listo.</desc>
+          <defs>
+            <marker id="sq-arrow" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><polygon points="0 0, 9 3.5, 0 7" fill="var(--dg-muted)"/></marker>
+            <marker id="sq-arrow-accent" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><polygon points="0 0, 9 3.5, 0 7" fill="var(--dg-accent)"/></marker>
+          </defs>
+          <rect width="100%" height="100%" fill="var(--dg-paper)"/>
+
+          <!-- Lifelines -->
+          <g stroke="var(--dg-hair)" stroke-width="1" stroke-dasharray="3,3">
+            <line x1="90" y1="66" x2="90" y2="600"/>
+            <line x1="330" y1="66" x2="330" y2="600"/>
+            <line x1="560" y1="66" x2="560" y2="600"/>
+          </g>
+
+          <!-- Actor boxes -->
+          <g>
+            <rect x="24" y="18" width="132" height="42" rx="6" fill="var(--dg-surface)" stroke="var(--dg-ink)" stroke-width="1"/>
+            <text x="90" y="43" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--dg-ink)">Usuario</text>
+            <rect x="252" y="18" width="156" height="42" rx="6" fill="var(--dg-surface)" stroke="var(--dg-ink)" stroke-width="1"/>
+            <text x="330" y="38" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--dg-ink)">Next.js</text>
+            <text x="330" y="52" text-anchor="middle" class="mono" font-size="8.5" fill="var(--dg-soft)">pantallas + /api</text>
+            <rect x="496" y="18" width="128" height="42" rx="6" fill="var(--dg-accent-soft)" stroke="var(--dg-accent)" stroke-width="1.3"/>
+            <text x="560" y="43" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--dg-ink)">Higgsfield</text>
+          </g>
+
+          <!-- Activation bars -->
+          <g fill="rgba(12,10,9,0.05)" stroke="var(--dg-muted)" stroke-width="0.8">
+            <rect x="326" y="90" width="8" height="164"/>
+            <rect x="556" y="126" width="8" height="60"/>
+            <rect x="326" y="290" width="8" height="140"/>
+            <rect x="556" y="326" width="8" height="40"/>
+            <rect x="326" y="480" width="8" height="90"/>
+          </g>
+
+          <!-- ── Mensajes: cada <g class="seq-msg"> es un paso ── -->
+          <g class="mono" font-size="9.5">
+            <g class="seq-msg">
+              <path d="M90,90 H326" fill="none" stroke="var(--dg-muted)" stroke-width="1.2" marker-end="url(#sq-arrow)"/>
+              <rect x="112" y="76" width="192" height="13" fill="var(--dg-paper)"/>
+              <text x="112" y="86" fill="var(--dg-ink)">POST /api/image {photo, mood}</text>
+            </g>
+            <g class="seq-msg">
+              <path d="M334,126 H556" fill="none" stroke="var(--dg-muted)" stroke-width="1.2" marker-end="url(#sq-arrow)"/>
+              <rect x="350" y="112" width="196" height="13" fill="var(--dg-paper)"/>
+              <text x="350" y="122" fill="var(--dg-ink)">higgsfield-ai/soul/reference</text>
+            </g>
+            <g class="seq-msg">
+              <path d="M556,162 H334" fill="none" stroke="var(--dg-muted)" stroke-width="1.1" stroke-dasharray="5,4" marker-end="url(#sq-arrow)"/>
+              <rect x="380" y="148" width="120" height="13" fill="var(--dg-paper)"/>
+              <text x="440" y="158" text-anchor="middle" fill="var(--dg-muted)">imageUrl</text>
+            </g>
+            <g class="seq-msg">
+              <path d="M326,232 H90" fill="none" stroke="var(--dg-accent)" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#sq-arrow-accent)"/>
+              <rect x="128" y="196" width="160" height="30" fill="var(--dg-paper)"/>
+              <text x="130" y="208" fill="var(--dg-accent)" font-weight="700">200 {imageUrl}</text>
+              <text x="130" y="221" fill="var(--dg-soft)">primer resultado real</text>
+            </g>
+
+            <g class="seq-msg">
+              <path d="M90,290 H326" fill="none" stroke="var(--dg-muted)" stroke-width="1.2" marker-end="url(#sq-arrow)"/>
+              <rect x="112" y="276" width="188" height="13" fill="var(--dg-paper)"/>
+              <text x="112" y="286" fill="var(--dg-ink)">POST /api/video {imageUrl}</text>
+            </g>
+            <g class="seq-msg">
+              <path d="M334,326 H556" fill="none" stroke="var(--dg-muted)" stroke-width="1.2" marker-end="url(#sq-arrow)"/>
+              <rect x="350" y="312" width="196" height="13" fill="var(--dg-paper)"/>
+              <text x="350" y="322" fill="var(--dg-ink)">higgsfield-ai/dop/{calidad}</text>
+            </g>
+            <g class="seq-msg">
+              <path d="M556,360 H334" fill="none" stroke="var(--dg-muted)" stroke-width="1.1" stroke-dasharray="5,4" marker-end="url(#sq-arrow)"/>
+              <rect x="390" y="346" width="100" height="13" fill="var(--dg-paper)"/>
+              <text x="440" y="356" text-anchor="middle" fill="var(--dg-muted)">jobId</text>
+            </g>
+            <g class="seq-msg">
+              <path d="M326,410 H90" fill="none" stroke="var(--dg-muted)" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#sq-arrow)"/>
+              <rect x="118" y="396" width="176" height="13" fill="var(--dg-paper)"/>
+              <text x="120" y="406" fill="var(--dg-ink)">200 {jobId} → /result</text>
+            </g>
+          </g>
+
+          <!-- Fragmento loop -->
+          <rect x="66" y="452" width="284" height="126" rx="4" fill="rgba(12,10,9,0.02)" stroke="var(--dg-hair)" stroke-width="1"/>
+          <rect x="66" y="452" width="44" height="16" rx="2" fill="var(--dg-paper)" stroke="var(--dg-hair)" stroke-width="1"/>
+          <text x="88" y="464" text-anchor="middle" class="mono" font-size="8" letter-spacing="0.1em" fill="var(--dg-muted)">LOOP</text>
+          <text x="120" y="464" class="mono" font-size="8.5" fill="var(--dg-soft)">[cada 3s, hasta status = ready]</text>
+
+          <g class="mono" font-size="9.5">
+            <g class="seq-msg">
+              <path d="M90,500 H326" fill="none" stroke="var(--dg-muted)" stroke-width="1.1" marker-end="url(#sq-arrow)"/>
+              <rect x="108" y="486" width="164" height="13" fill="var(--dg-paper)"/>
+              <text x="110" y="496" fill="var(--dg-ink)">GET /api/video/[id]</text>
+            </g>
+            <g class="seq-msg">
+              <path d="M326,548 H90" fill="none" stroke="var(--dg-muted)" stroke-width="1.1" stroke-dasharray="5,4" marker-end="url(#sq-arrow)"/>
+              <rect x="130" y="534" width="156" height="13" fill="var(--dg-paper)"/>
+              <text x="132" y="544" fill="var(--dg-ink)">{status: pending → ready}</text>
+            </g>
+          </g>
+
+          <g class="seq-msg">
+            <text x="90" y="600" text-anchor="middle" font-size="10.5" font-weight="600" fill="var(--dg-accent)">▶ reproduce inline</text>
+          </g>
+        </svg>
+      </div>
+      <div class="dg-legend">
+        <div class="dg-legend-item"><span class="dg-swatch solid"></span><span class="caption">Llamada (espera respuesta)</span></div>
+        <div class="dg-legend-item"><span class="dg-swatch dashed"></span><span class="caption">Retorno</span></div>
+        <div class="dg-legend-item"><span class="dg-swatch solid accent"></span><span class="caption">Respuesta principal</span></div>
+        <div class="dg-legend-item"><span class="caption mono">▭ LOOP</span><span class="caption">fragmento combinado (repetición)</span></div>
+      </div>
+      <p class="body section-note">La imagen se genera dentro de una sola llamada — Next.js sondea a Higgsfield internamente, cada 2s hasta 90 intentos, y responde una vez con el resultado. El video sí expone su espera: <code class="mono">/api/video/[id]</code> se consulta cada tres segundos desde el cliente hasta que el estado deja de ser <code class="mono">pending</code> (FR-012).</p>
+    </div>
+  </section>
+
+  <!-- ── 6 · El método ─────────────────────────────────────────────── -->
+  <section class="section" id="metodo" aria-labelledby="metodo-h">
+    <div class="shell">
+      <div class="section-head reveal">
+        <span class="label">Proceso de entrega</span>
+        <h2 id="metodo-h" class="display-md">5 personas, 5 fases, cero conflictos de merge.</h2>
+        <p class="body">Sergio construye la base. Mateo, Johan y Tomás arrancan sus tres fases al mismo tiempo, en ramas distintas. Santiago las junta y cierra. Nadie espera a nadie porque cada fase declara de qué archivos es dueña — <code class="mono">Owns</code> — y cuáles nunca toca — <code class="mono">Never touches</code> —, y ningún archivo aparece en dos listas.</p>
+      </div>
+
+      <div class="dg-wrap">
+        <svg class="dg" data-diagram="true" viewBox="0 0 900 460" role="img" aria-labelledby="pr-t pr-d">
+          <title id="pr-t">Proceso de entrega en paralelo por propiedad de archivos</title>
+          <desc id="pr-d">Sergio construye la fase 1 en main. A partir de ahí, Mateo, Johan y Tomás construyen las fases 2, 3 y 4 al mismo tiempo, cada uno en su propia rama y sus propios archivos. Santiago junta las tres ramas y cierra con la fase 5, incluyendo el ticket T032 que compara el backend falso contra el real.</desc>
+          <defs>
+            <marker id="pr-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="var(--dg-muted)"/></marker>
+            <marker id="pr-arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="var(--dg-accent)"/></marker>
+          </defs>
+          <rect width="100%" height="100%" fill="var(--dg-paper)"/>
+
+          <!-- filas alternas -->
+          <rect x="140" y="34" width="740" height="72" fill="rgba(12,10,9,0.018)"/>
+          <rect x="140" y="178" width="740" height="72" fill="rgba(12,10,9,0.018)"/>
+          <rect x="140" y="322" width="740" height="72" fill="rgba(12,10,9,0.018)"/>
+          <g stroke="var(--dg-hair-soft)" stroke-width="0.8">
+            <line x1="140" y1="34" x2="880" y2="34"/><line x1="140" y1="106" x2="880" y2="106"/>
+            <line x1="140" y1="178" x2="880" y2="178"/><line x1="140" y1="250" x2="880" y2="250"/>
+            <line x1="140" y1="322" x2="880" y2="322"/><line x1="140" y1="394" x2="880" y2="394"/>
+          </g>
+          <line x1="140" y1="34" x2="140" y2="394" stroke="var(--dg-hair)" stroke-width="1"/>
+
+          <!-- etiquetas de fila -->
+          <g class="mono" font-size="10" font-weight="600" fill="var(--dg-muted)" text-anchor="middle" letter-spacing="0.06em">
+            <text x="70" y="74">SERGIO</text>
+            <text x="70" y="218">MATEO</text>
+            <text x="70" y="290">JOHAN</text>
+            <text x="70" y="362">TOMÁS</text>
+          </g>
+          <text x="70" y="146" class="mono" font-size="10" font-weight="700" fill="var(--dg-accent)" text-anchor="middle" letter-spacing="0.06em">SANTIAGO</text>
+
+          <!-- Conectores: plantilla de codo redondeado r=8, un mid-x distinto por línea -->
+          <g class="dg-line" fill="none" stroke="var(--dg-muted)" stroke-width="1.1">
+            <path d="M330,58 H382 Q390,58 390,66 V206 Q390,214 398,214 H460" marker-end="url(#pr-arrow)"/>
+            <path d="M330,70 H402 Q410,70 410,78 V278 Q410,286 418,286 H460" marker-end="url(#pr-arrow)"/>
+            <path d="M330,82 H422 Q430,82 430,90 V350 Q430,358 438,358 H460" marker-end="url(#pr-arrow)"/>
+          </g>
+          <g class="dg-line" fill="none" stroke="var(--dg-accent)" stroke-width="1.4">
+            <path d="M700,214 H747 Q755,214 755,206 V138 Q755,130 763,130 H820" marker-end="url(#pr-arrow-accent)"/>
+            <path d="M700,286 H767 Q775,286 775,278 V150 Q775,142 783,142 H820" marker-end="url(#pr-arrow-accent)"/>
+            <path d="M700,358 H787 Q795,358 795,350 V162 Q795,154 803,154 H820" marker-end="url(#pr-arrow-accent)"/>
+          </g>
+
+          <!-- Nodo Fase 1 -->
+          <g class="dg-node">
+            <rect x="150" y="42" width="180" height="56" rx="8" fill="var(--dg-surface)" stroke="var(--dg-ink)" stroke-width="1"/>
+            <text x="164" y="64" font-size="12" font-weight="600" fill="var(--dg-ink)">Fase 1 · la base</text>
+            <text x="164" y="80" class="mono" font-size="9" fill="var(--dg-soft)">main</text>
+          </g>
+
+          <!-- Nodos fase 2/3/4 en paralelo -->
+          <g class="dg-node">
+            <rect x="460" y="186" width="240" height="56" rx="8" fill="var(--dg-surface)" stroke="var(--dg-ink)" stroke-width="1"/>
+            <text x="474" y="208" font-size="12" font-weight="600" fill="var(--dg-ink)">Fase 2 · pantallas</text>
+            <text x="474" y="224" class="mono" font-size="8.5" fill="var(--dg-soft)">001-frontend · Owns: app/page.jsx,</text>
+            <text x="474" y="234" class="mono" font-size="8.5" fill="var(--dg-soft)">capture/, result/, proxy.js</text>
+          </g>
+          <g class="dg-node">
+            <rect x="460" y="258" width="240" height="56" rx="8" fill="var(--dg-surface)" stroke="var(--dg-ink)" stroke-width="1"/>
+            <text x="474" y="280" font-size="12" font-weight="600" fill="var(--dg-ink)">Fase 3 · backend</text>
+            <text x="474" y="296" class="mono" font-size="8.5" fill="var(--dg-soft)">001-backend · Owns: lib/db.js,</text>
+            <text x="474" y="306" class="mono" font-size="8.5" fill="var(--dg-soft)">lib/higgsfield.js, app/api/image·video</text>
+          </g>
+          <g class="dg-node">
+            <rect x="460" y="330" width="240" height="56" rx="8" fill="var(--dg-surface)" stroke="var(--dg-ink)" stroke-width="1"/>
+            <text x="474" y="352" font-size="12" font-weight="600" fill="var(--dg-ink)">Fase 4 · dashboard</text>
+            <text x="474" y="368" class="mono" font-size="8.5" fill="var(--dg-soft)">001-dashboard · Owns: lib/settings.js,</text>
+            <text x="474" y="378" class="mono" font-size="8.5" fill="var(--dg-soft)">app/dashboard/, app/api/settings/</text>
+          </g>
+
+          <!-- Nodo focal Fase 5 -->
+          <g class="dg-node">
+            <rect x="820" y="114" width="60" height="56" rx="8" fill="var(--dg-accent-soft)" stroke="var(--dg-accent)" stroke-width="1.6"/>
+            <text x="850" y="138" text-anchor="middle" font-size="11" font-weight="700" fill="var(--dg-ink)">Fase 5</text>
+            <text x="850" y="152" text-anchor="middle" class="mono" font-size="8" fill="var(--dg-muted)">merge</text>
+            <text x="850" y="163" text-anchor="middle" class="mono" font-size="8" fill="var(--dg-muted)">+ T032</text>
+          </g>
+
+          <line x1="140" y1="418" x2="880" y2="418" stroke="var(--dg-hair-soft)" stroke-width="1"/>
+          <g class="mono" font-size="9" fill="var(--dg-soft)">
+            <text x="140" y="436">— entrega normal</text>
+            <text x="300" y="436" fill="var(--dg-accent)">— converge en Santiago (foco: el merge)</text>
+            <text x="140" y="452">Owns / Never touches por fase — ningún archivo se edita desde dos ramas</text>
+          </g>
+        </svg>
+      </div>
+      <div class="dg-legend">
+        <div class="dg-legend-item"><span class="dg-dot node"></span><span class="caption">Fase, con la rama y sus archivos</span></div>
+        <div class="dg-legend-item"><span class="dg-dot focal"></span><span class="caption">Fase 5 — el único punto de integración</span></div>
+      </div>
+
+      <div class="owns-grid">
+        <div class="owns-card"><header><h3>Fase 1</h3><span class="branch mono">main</span></header><dl><dt>Owns</dt><dd>Todo lo que no es de las fases 2, 3 o 4 — el esqueleto, el sistema de diseño, los dobles de prueba.</dd></dl></div>
+        <div class="owns-card"><header><h3>Fase 2 · Mateo</h3><span class="branch mono">001-frontend</span></header><dl><dt>Owns</dt><dd>Pantallas, <code class="mono">proxy.js</code>, hooks.</dd><dt>Never touches</dt><dd class="never"><code class="mono">lib/</code>, <code class="mono">app/api/</code>, <code class="mono">app/dashboard/</code>.</dd></dl></div>
+        <div class="owns-card"><header><h3>Fase 3 · Johan</h3><span class="branch mono">001-backend</span></header><dl><dt>Owns</dt><dd><code class="mono">lib/db.js</code>, <code class="mono">lib/higgsfield.js</code>, rutas de imagen/video.</dd><dt>Never touches</dt><dd class="never">Ninguna pantalla, <code class="mono">app/dashboard/</code>, <code class="mono">app/api/settings/</code>.</dd></dl></div>
+        <div class="owns-card"><header><h3>Fase 4 · Tomás</h3><span class="branch mono">001-dashboard</span></header><dl><dt>Owns</dt><dd><code class="mono">lib/settings.js</code>, <code class="mono">app/dashboard/</code>, T030: las llaves reales.</dd><dt>Never touches</dt><dd class="never"><code class="mono">lib/db.js</code>, <code class="mono">lib/higgsfield.js</code>, pantallas de fase 2.</dd></dl></div>
+        <div class="owns-card" data-focal="true"><header><h3>Fase 5 · Santiago</h3><span class="branch mono">main</span></header><dl><dt>Owns</dt><dd>Nada nuevo — junta las tres ramas, corre T032, T033, T037 y despliega.</dd></dl></div>
+      </div>
+      <div class="callout reveal">
+        <p>Tests verdes no significan app funcionando. T032 es la comprobación de que el backend falso de Mateo y el real de Johan se comportan igual — el error que ninguna prueba unitaria ve por sí sola.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 7 · Por qué le importa a un líder TI ─────────────────────── -->
+  <section class="section" aria-labelledby="lider-h">
+    <div class="shell">
+      <div class="section-head reveal">
+        <span class="label">Lectura para quien decide arquitectura</span>
+        <h2 id="lider-h" class="display-md">Seis decisiones que no son solo técnicas.</h2>
+      </div>
+      <div class="leader-grid">
+        <div class="leader-card reveal"><span class="n mono">01</span><h3 class="heading">Paralelismo por contrato de archivos</h3><p class="body-sm">Tres personas construyen a la vez sin coordinarse en vivo. El límite no es disciplina de equipo, es una lista de archivos por fase que no se solapa.</p><span class="ref">Principio V · plan.md</span></div>
+        <div class="leader-card reveal"><span class="n mono">02</span><h3 class="heading">Superficie de un solo proveedor de IA</h3><p class="body-sm">Higgsfield sirve imagen y video con el mismo contrato. Un proveedor menos que auditar, negociar y monitorear en producción.</p><span class="ref">plan.md · Provider</span></div>
+        <div class="leader-card reveal"><span class="n mono">03</span><h3 class="heading">Freno de gasto sin redeploy</h3><p class="body-sm">Un interruptor persistido detiene toda generación nueva al instante. El trabajo en curso no se corta — solo se cierra la llave de nuevas llamadas pagadas.</p><span class="ref">FR-017 · FR-019</span></div>
+        <div class="leader-card reveal"><span class="n mono">04</span><h3 class="heading">Test-first como política, no como esperanza</h3><p class="body-sm">Cada ticket registra su prueba fallando antes que el código que la pasa. La suite corre completa sin credenciales, sin red, en menos de 60 segundos.</p><span class="ref">FR-031 · FR-032</span></div>
+        <div class="leader-card reveal"><span class="n mono">05</span><h3 class="heading">La especificación es auditable</h3><p class="body-sm">39 tickets trazables a <code class="mono">spec.md</code>. Lo que la app hace hoy se puede leer antes de correr una sola línea de código.</p><span class="ref">specs/001-ai-media-generator/</span></div>
+        <div class="leader-card reveal"><span class="n mono">06</span><h3 class="heading">El merge no es el final de la verificación</h3><p class="body-sm">T032 compara explícitamente el doble de prueba contra el proveedor real antes de desplegar. Ramas verdes por separado no garantizan un sistema correcto junto.</p><span class="ref">T031–T033</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 8 · Cierre ─────────────────────────────────────────────────── -->
+  <section class="closing" aria-labelledby="cierre-h">
+    <div class="shell">
+      <h2 id="cierre-h" class="display-lg">La especificación es el código fuente.</h2>
+      <div class="closing-actions">
+        <a class="btn btn-primary" href="../">Ver la landing</a>
+        <a class="btn btn-tertiary" href="https://github.com/sjunka/speckit-ai-generator">Ver el repositorio</a>
+      </div>
+      <p class="caption">39 tickets, 5 fases, 5 personas. Cero líneas de código de aplicación escritas a mano.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <div class="shell foot-cols">
+    <section>
+      <h2>Repositorio</h2>
+      <ul>
+        <li><a href="https://github.com/sjunka/speckit-ai-generator">GitHub</a></li>
+        <li><a href="https://github.com/sjunka/speckit-ai-generator/blob/main/specs/001-ai-media-generator/spec.md">spec.md</a></li>
+        <li><a href="https://github.com/sjunka/speckit-ai-generator/blob/main/specs/001-ai-media-generator/plan.md">plan.md</a></li>
+        <li><a href="https://github.com/sjunka/speckit-ai-generator/blob/main/specs/001-ai-media-generator/tasks.md">tasks.md</a></li>
+      </ul>
+    </section>
+    <section>
+      <h2>Documentación</h2>
+      <ul>
+        <li><a href="https://github.com/sjunka/speckit-ai-generator/blob/main/docs/GUIA-SPEC-KIT.pdf">La guía en PDF</a></li>
+        <li><a href="https://github.com/sjunka/speckit-ai-generator/blob/main/docs/GUION-PRESENTACION.pdf">Guion de la presentación</a></li>
+        <li><a href="https://github.com/github/spec-kit">GitHub Spec Kit</a></li>
+      </ul>
+    </section>
+    <section>
+      <h2>El equipo</h2>
+      <ul class="foot-team">
+        <li>Sergio · fase 1</li>
+        <li>Mateo · fase 2</li>
+        <li>Johan · fase 3</li>
+        <li>Tomás · fase 4</li>
+        <li>Santiago · fase 5</li>
+      </ul>
+    </section>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+// Motion es una capa de presentación: todo el contenido ya es completo y
+// legible sin JS. Si el usuario pide menos movimiento, no se añade ninguno.
+(function () {
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce || typeof gsap === 'undefined') return;
+  document.documentElement.classList.add('js');
+  gsap.registerPlugin(ScrollTrigger);
+
+  // ── 1 · Héroe: entra al cargar, una sola vez ─────────────────────────
+  gsap.timeline({ defaults: { ease: 'power3.out' } })
+    .from('[data-hero-el]', { opacity: 0, y: 18, duration: 0.6, stagger: 0.1 });
+
+  // ── 2 · Franja de números: cuentan hacia arriba al entrar en vista ──
+  gsap.utils.toArray('[data-count]').forEach(function (el) {
+    var end = +el.dataset.count;
+    ScrollTrigger.create({
+      trigger: el, start: 'top 85%', once: true,
+      onEnter: function () {
+        var obj = { v: 0 };
+        gsap.to(obj, {
+          v: end, duration: 1, ease: 'power2.out',
+          onUpdate: function () { el.textContent = Math.round(obj.v); }
+        });
+      }
+    });
+  });
+
+  // ── 3 · Revelado genérico de secciones y tarjetas ────────────────────
+  gsap.utils.toArray('.reveal').forEach(function (el) {
+    gsap.fromTo(el, { opacity: 0, y: 20 }, {
+      opacity: 1, y: 0, duration: 0.6, ease: 'power3.out',
+      scrollTrigger: { trigger: el, start: 'top 85%', once: true }
+    });
+  });
+  gsap.utils.toArray('.reveal-stagger').forEach(function (group) {
+    gsap.fromTo(group.children, { opacity: 0, y: 16 }, {
+      opacity: 1, y: 0, duration: 0.5, ease: 'power3.out', stagger: 0.06,
+      scrollTrigger: { trigger: group, start: 'top 88%', once: true }
+    });
+  });
+
+  // ── 4 · Diagramas: los nodos aparecen, luego los conectores se dibujan ──
+  document.querySelectorAll('[data-diagram]').forEach(function (svg) {
+    var nodes = svg.querySelectorAll('.dg-node');
+    var lines = svg.querySelectorAll('.dg-line');
+    var lens = [];
+    lines.forEach(function (g, i) {
+      g.querySelectorAll('path, line').forEach(function (p) {
+        var len = p.getTotalLength();
+        p.style.strokeDasharray = len;
+        p.style.strokeDashoffset = len;
+        lens.push(p);
+      });
+    });
+    ScrollTrigger.create({
+      trigger: svg, start: 'top 78%', once: true,
+      onEnter: function () {
+        var tl = gsap.timeline();
+        tl.from(nodes, { opacity: 0, scale: 0.88, transformOrigin: '50% 50%', duration: 0.45, ease: 'back.out(1.6)', stagger: 0.05 });
+        tl.to(lens, { strokeDashoffset: 0, duration: 0.5, ease: 'power2.out', stagger: 0.05 }, '-=0.15');
+      }
+    });
+  });
+
+  // ── 5 · Secuencia: los mensajes se activan paso a paso con el scroll ──
+  var seq = document.querySelector('[data-sequence]');
+  if (seq) {
+    var msgs = seq.querySelectorAll('.seq-msg');
+    var actors = seq.querySelectorAll('.dg-node, defs, title, desc');
+    gsap.set(msgs, { opacity: 0.15 });
+    ScrollTrigger.create({
+      trigger: seq, start: 'top 65%', end: 'bottom 75%', scrub: 0.5,
+      onUpdate: function (self) {
+        var idx = Math.floor(self.progress * msgs.length);
+        msgs.forEach(function (m, i) {
+          gsap.to(m, { opacity: i <= idx ? 1 : 0.15, duration: 0.15, overwrite: 'auto' });
+        });
+      }
+    });
+  }
+
+  ScrollTrigger.refresh();
+})();
+</script>
+</body>
+</html>
