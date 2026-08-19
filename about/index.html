@@ -240,6 +240,20 @@ a { color: inherit; }
 .owns-card dd.never { color: var(--color-ink-subtle); }
 .owns-card[data-focal="true"] { border-color: var(--color-ink); }
 
+/* Fases: clic para destacar la que se está explicando */
+.owns-hint { color: var(--color-ink-tertiary); margin-top: 28px; }
+.owns-hint[hidden] { display: none; }
+[data-owns] .owns-card { cursor: pointer; transition: border-color 180ms ease, background-color 180ms ease, box-shadow 180ms ease; }
+[data-owns] .owns-card:hover { border-color: var(--color-hairline-strong); }
+[data-owns] .owns-card[data-on="true"] {
+  border-color: color-mix(in srgb, var(--tint) 65%, var(--color-ink));
+  background: color-mix(in srgb, var(--tint) 20%, var(--color-surface-2));
+  box-shadow: var(--shadow-lift);
+}
+[data-owns] .owns-card[data-on="true"] h3 { color: var(--color-ink); }
+[data-owns] .owns-card[data-on="true"] dt { color: color-mix(in srgb, var(--tint) 30%, var(--color-ink-muted)); }
+[data-owns] .owns-card[data-on="true"] dd { color: var(--color-ink); }
+
 /* ── Por qué le importa a un líder TI ──────────────────────────────────── */
 .leader-grid { display: grid; gap: 16px; margin-top: 40px; }
 .leader-card { background: var(--color-surface-2); border: 1px solid var(--color-hairline); border-radius: 12px; padding: 22px; }
@@ -247,6 +261,30 @@ a { color: inherit; }
 .leader-card h3 { margin-bottom: 8px; }
 .leader-card p { max-width: 42ch; }
 .leader-card .ref { display: inline-block; margin-top: 12px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.05em; color: var(--color-ink-tertiary); border: 1px solid var(--color-hairline-strong); border-radius: 4px; padding: 2px 6px; }
+
+/* Decisiones: el reverso ocupa la misma celda de grid, así la tarjeta
+   mide lo que mida la cara más alta y ninguna se recorta. */
+.leader-hint { color: var(--color-ink-tertiary); margin-top: 28px; }
+.leader-hint[hidden] { display: none; }
+.leader-card { transition: border-color 220ms ease, background-color 220ms ease, box-shadow 220ms ease; }
+@media (hover: none) { .leader-card { cursor: pointer; } }
+.leader-card .n { transition: color 220ms ease; }
+.lc-faces { display: grid; }
+.lc-front, .lc-back { grid-area: 1 / 1; }
+.lc-back { pointer-events: none; }
+.lc-back-h { color: color-mix(in srgb, var(--tint) 45%, var(--color-ink)); }
+.ref-hot { border-color: color-mix(in srgb, var(--tint) 60%, var(--color-hairline-strong)); color: var(--color-ink-muted); }
+.leader-card[data-hot="true"] {
+  border-color: color-mix(in srgb, var(--tint) 60%, var(--color-ink));
+  background: color-mix(in srgb, var(--tint) 16%, var(--color-surface-2));
+  box-shadow: var(--shadow-lift);
+}
+.leader-card[data-hot="true"] .n { color: color-mix(in srgb, var(--tint) 45%, var(--color-ink)); }
+/* Base sin JS (y con prefers-reduced-motion): el reverso se muestra igual,
+   sólo que sin recorrido. Con GSAP activo el estilo en línea gana y anima. */
+.lc-back { opacity: 0; }
+.leader-card:hover .lc-back, .leader-card:focus-within .lc-back { opacity: 1; }
+.leader-card:hover .lc-front, .leader-card:focus-within .lc-front { opacity: 0; }
 
 .closing { position: relative; padding-block: var(--section); text-align: center; overflow: clip; }
 .closing::before { content: ""; position: absolute; left: 50%; top: 10%; width: 560px; height: 560px; transform: translateX(-50%); border-radius: 50%; filter: blur(80px); opacity: 0.45; background: radial-gradient(circle, var(--color-orb-peach), transparent 66%); pointer-events: none; }
@@ -947,12 +985,14 @@ a { color: inherit; }
         <div class="dg-legend-item"><span class="dg-dot focal"></span><span class="caption">Fase 5 — el único punto de integración</span></div>
       </div>
 
-      <div class="owns-grid">
-        <div class="owns-card"><header><h3>Fase 1</h3><span class="branch mono">main</span></header><dl><dt>Owns</dt><dd>Todo lo que no es de las fases 2, 3 o 4 — el esqueleto, el sistema de diseño, los dobles de prueba.</dd></dl></div>
-        <div class="owns-card"><header><h3>Fase 2 · Mateo</h3><span class="branch mono">001-frontend</span></header><dl><dt>Owns</dt><dd>Pantallas, <code class="mono">proxy.js</code>, hooks.</dd><dt>Never touches</dt><dd class="never"><code class="mono">lib/</code>, <code class="mono">app/api/</code>, <code class="mono">app/dashboard/</code>.</dd></dl></div>
-        <div class="owns-card"><header><h3>Fase 3 · Johan</h3><span class="branch mono">001-backend</span></header><dl><dt>Owns</dt><dd><code class="mono">lib/db.js</code>, <code class="mono">lib/higgsfield.js</code>, rutas de imagen/video.</dd><dt>Never touches</dt><dd class="never">Ninguna pantalla, <code class="mono">app/dashboard/</code>, <code class="mono">app/api/settings/</code>.</dd></dl></div>
-        <div class="owns-card"><header><h3>Fase 4 · Tomás</h3><span class="branch mono">001-dashboard</span></header><dl><dt>Owns</dt><dd><code class="mono">lib/settings.js</code>, <code class="mono">app/dashboard/</code>, T030: las llaves reales.</dd><dt>Never touches</dt><dd class="never"><code class="mono">lib/db.js</code>, <code class="mono">lib/higgsfield.js</code>, pantallas de fase 2.</dd></dl></div>
-        <div class="owns-card" data-focal="true"><header><h3>Fase 5 · Santiago</h3><span class="branch mono">main</span></header><dl><dt>Owns</dt><dd>Nada nuevo — junta las tres ramas, corre T032, T033, T037 y despliega.</dd></dl></div>
+      <p class="caption owns-hint" data-owns-hint hidden>Haz clic en una fase para destacarla mientras hablas de ella.</p>
+      <div class="owns-grid" data-owns>
+        <div class="owns-card" style="--tint: var(--color-orb-sky)"><header><h3>Fase 1</h3><span class="branch mono">main</span></header><dl><dt>Owns</dt><dd>Todo lo que no es de las fases 2, 3 o 4 — el esqueleto, el sistema de diseño, los dobles de prueba.</dd></dl></div>
+        <div class="owns-card" style="--tint: var(--color-orb-lavender)"><header><h3>Fase 2 · Mateo</h3><span class="branch mono">001-frontend</span></header><dl><dt>Owns</dt><dd>Pantallas, <code class="mono">proxy.js</code>, hooks.</dd><dt>Never touches</dt><dd class="never"><code class="mono">lib/</code>, <code class="mono">app/api/</code>, <code class="mono">app/dashboard/</code>.</dd></dl></div>
+        <div class="owns-card" style="--tint: var(--color-orb-mint)"><header><h3>Fase 3 · Johan</h3><span class="branch mono">001-backend</span></header><dl><dt>Owns</dt><dd><code class="mono">lib/db.js</code>, <code class="mono">lib/higgsfield.js</code>, rutas de imagen/video.</dd><dt>Never touches</dt><dd class="never">Ninguna pantalla, <code class="mono">app/dashboard/</code>, <code class="mono">app/api/settings/</code>.</dd></dl></div>
+        <div class="owns-card" style="--tint: var(--color-orb-peach)"><header><h3>Fase 4 · Tomás</h3><span class="branch mono">001-dashboard</span></header><dl><dt>Owns</dt><dd><code class="mono">lib/settings.js</code>, <code class="mono">app/dashboard/</code>, T030: las llaves reales.</dd><dt>Never touches</dt><dd class="never"><code class="mono">lib/db.js</code>, <code class="mono">lib/higgsfield.js</code>, pantallas de fase 2.</dd></dl></div>
+        <div class="owns-card" style="--tint: var(--color-orb-rose)" data-focal="true"><header><h3>Fase 5 · Santiago</h3><span class="branch mono">main</span></header><dl><dt>Owns</dt><dd>Nada nuevo — junta las tres ramas, corre T032, T033, T037 y despliega.</dd></dl></div>
+      </div>
       </div>
     </div>
   </section>
@@ -1000,13 +1040,15 @@ a { color: inherit; }
         <span class="label">Lectura para quien decide arquitectura</span>
         <h2 id="lider-h" class="display-md">Seis decisiones que no son solo técnicas.</h2>
       </div>
+      <p class="caption leader-hint" data-leader-hint>Pasa el mouse por una tarjeta para ver qué significa en la práctica.</p>
       <div class="leader-grid">
-        <div class="leader-card reveal"><span class="n mono">01</span><h3 class="heading">Paralelismo por contrato de archivos</h3><p class="body-sm">Tres personas construyen a la vez sin coordinarse en vivo. El límite no es disciplina de equipo, es una lista de archivos por fase que no se solapa.</p><span class="ref">Principio V · plan.md</span></div>
-        <div class="leader-card reveal"><span class="n mono">02</span><h3 class="heading">Superficie de un solo proveedor de IA</h3><p class="body-sm">Higgsfield sirve imagen y video con el mismo contrato. Un proveedor menos que auditar, negociar y monitorear en producción.</p><span class="ref">plan.md · Provider</span></div>
-        <div class="leader-card reveal"><span class="n mono">03</span><h3 class="heading">Freno de gasto sin redeploy</h3><p class="body-sm">Un interruptor persistido detiene toda generación nueva al instante. El trabajo en curso no se corta — solo se cierra la llave de nuevas llamadas pagadas.</p><span class="ref">FR-017 · FR-019</span></div>
-        <div class="leader-card reveal"><span class="n mono">04</span><h3 class="heading">Test-first como política, no como esperanza</h3><p class="body-sm">Cada ticket registra su prueba fallando antes que el código que la pasa. La suite corre completa sin credenciales, sin red, en menos de 60 segundos.</p><span class="ref">FR-031 · FR-032</span></div>
-        <div class="leader-card reveal"><span class="n mono">05</span><h3 class="heading">La especificación es auditable</h3><p class="body-sm">39 tickets trazables a <code class="mono">spec.md</code>. Lo que la app hace hoy se puede leer antes de correr una sola línea de código.</p><span class="ref">specs/001-ai-media-generator/</span></div>
-        <div class="leader-card reveal"><span class="n mono">06</span><h3 class="heading">El merge no es el final de la verificación</h3><p class="body-sm">T032 compara explícitamente el doble de prueba contra el proveedor real antes de desplegar. Ramas verdes por separado no garantizan un sistema correcto junto.</p><span class="ref">T031–T033</span></div>
+        <div class="leader-card reveal" tabindex="0" style="--tint: var(--color-orb-sky)"><span class="n mono">01</span><div class="lc-faces"><div class="lc-front"><h3 class="heading">Paralelismo por contrato de archivos</h3><p class="body-sm">Tres personas construyen a la vez sin coordinarse en vivo. El límite no es disciplina de equipo, es una lista de archivos por fase que no se solapa.</p><span class="ref">Principio V · plan.md</span></div><div class="lc-back"><h3 class="heading lc-back-h">Tres ramas sin pisarse</h3><p class="body-sm">Tres personas escribiendo código al mismo tiempo suena a conflicto de merge garantizado. No lo fue, porque antes de empezar decidimos quién toca qué archivo. Nadie tuvo que preguntar por el chat del grupo si podía editar algo.</p><span class="ref ref-hot">Nadie pregunta “¿puedo tocar este archivo?”</span></div></div></div>
+        <div class="leader-card reveal" tabindex="0" style="--tint: var(--color-orb-lavender)"><span class="n mono">02</span><div class="lc-faces"><div class="lc-front"><h3 class="heading">Superficie de un solo proveedor de IA</h3><p class="body-sm">Higgsfield sirve imagen y video con el mismo contrato. Un proveedor menos que auditar, negociar y monitorear en producción.</p><span class="ref">plan.md · Provider</span></div><div class="lc-back"><h3 class="heading lc-back-h">A quién llamas cuando se cae</h3><p class="body-sm">Cada proveedor que agregas es un contrato que firmar y una factura que revisar. Cuando algo se cae a media noche, con uno solo sabes exactamente a quién llamar.</p><span class="ref ref-hot">Un proveedor, un número al que llamar</span></div></div></div>
+        <div class="leader-card reveal" tabindex="0" style="--tint: var(--color-orb-peach)"><span class="n mono">03</span><div class="lc-faces"><div class="lc-front"><h3 class="heading">Freno de gasto sin redeploy</h3><p class="body-sm">Un interruptor persistido detiene toda generación nueva al instante. El trabajo en curso no se corta — solo se cierra la llave de nuevas llamadas pagadas.</p><span class="ref">FR-017 · FR-019</span></div><div class="lc-back"><h3 class="heading lc-back-h">El sábado que se dispara la factura</h3><p class="body-sm">Generar video se cobra por uso. Si el consumo se dispara un sábado, nadie quiere estar esperando un despliegue para frenarlo. El interruptor vive en la base de datos, así que se apaga desde el panel en un clic.</p><span class="ref ref-hot">El gasto se corta en un clic, no en un deploy</span></div></div></div>
+        <div class="leader-card reveal" tabindex="0" style="--tint: var(--color-orb-mint)"><span class="n mono">04</span><div class="lc-faces"><div class="lc-front"><h3 class="heading">Test-first como política, no como esperanza</h3><p class="body-sm">Cada ticket registra su prueba fallando antes que el código que la pasa. La suite corre completa sin credenciales, sin red, en menos de 60 segundos.</p><span class="ref">FR-031 · FR-032</span></div><div class="lc-back"><h3 class="heading lc-back-h">El minuto que te avisa</h3><p class="body-sm">Primero se escribe la prueba y falla. Después llega el código que la pone en verde. Parece burocracia hasta la primera vez que alguien rompe algo sin darse cuenta y la suite lo caza en menos de un minuto.</p><span class="ref ref-hot">Un minuto para saber si rompiste algo</span></div></div></div>
+        <div class="leader-card reveal" tabindex="0" style="--tint: var(--color-orb-rose)"><span class="n mono">05</span><div class="lc-faces"><div class="lc-front"><h3 class="heading">La especificación es auditable</h3><p class="body-sm">39 tickets trazables a <code class="mono">spec.md</code>. Lo que la app hace hoy se puede leer antes de correr una sola línea de código.</p><span class="ref">specs/001-ai-media-generator/</span></div><div class="lc-back"><h3 class="heading lc-back-h">Quien llegue el mes que viene</h3><p class="body-sm">Cualquiera puede leer qué hace la app sin abrir un archivo de código. Eso incluye al profesor que la califica y a quien entre al equipo el mes que viene.</p><span class="ref ref-hot">Se lee antes de compilar</span></div></div></div>
+        <div class="leader-card reveal" tabindex="0" style="--tint: var(--color-orb-sky)"><span class="n mono">06</span><div class="lc-faces"><div class="lc-front"><h3 class="heading">El merge no es el final de la verificación</h3><p class="body-sm">T032 compara explícitamente el doble de prueba contra el proveedor real antes de desplegar. Ramas verdes por separado no garantizan un sistema correcto junto.</p><span class="ref">T031–T033</span></div><div class="lc-back"><h3 class="heading lc-back-h">Verde y verde no siempre da verde</h3><p class="body-sm">Tres ramas pueden estar verdes por separado y romperse al juntarse. Por eso hay un ticket cuyo único trabajo es comparar el doble de prueba contra el proveedor real, antes de desplegar.</p><span class="ref ref-hot">Verde en tu rama no es verde en producción</span></div></div></div>
+      </div>
       </div>
     </div>
   </section>
@@ -1428,6 +1470,104 @@ a { color: inherit; }
       onLeave: function () { tl.pause(); syncButton(); },
       onLeaveBack: function () { tl.pause(); syncButton(); }
     });
+  }
+
+  // ── 7 · Fases: clic para destacar la que se está explicando ──────────
+  //
+  // Herramienta de presentación: al hablar de una fase, se selecciona y el
+  // resto baja de intensidad. Un solo seleccionado a la vez; volver a hacer
+  // clic lo suelta. El color de cada fase sale de la paleta de orbes.
+  var ownsGrid = document.querySelector('[data-owns]');
+  if (ownsGrid) {
+    var ownsHint = document.querySelector('[data-owns-hint]');
+    var ownsCards = Array.prototype.slice.call(ownsGrid.querySelectorAll('.owns-card'));
+
+    ownsCards.forEach(function (card, i) {
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('aria-pressed', 'false');
+      card.dataset.on = 'false';
+
+      function pick() {
+        var wasOn = card.dataset.on === 'true';
+        ownsCards.forEach(function (c) {
+          c.dataset.on = 'false';
+          c.setAttribute('aria-pressed', 'false');
+        });
+        if (!wasOn) {
+          card.dataset.on = 'true';
+          card.setAttribute('aria-pressed', 'true');
+        }
+        var live = wasOn ? null : card;
+        ownsCards.forEach(function (c) {
+          gsap.to(c, {
+            opacity: (!live || c === live) ? 1 : 0.45,
+            scale: c === live ? 1.025 : 1,
+            duration: 0.4, ease: c === live ? 'back.out(2.2)' : 'power2.out'
+          });
+        });
+        if (live) {
+          gsap.fromTo(live.querySelectorAll('dt, dd'), { opacity: 0, y: 8 }, {
+            opacity: 1, y: 0, duration: 0.4, stagger: 0.05, ease: 'power3.out'
+          });
+        }
+      }
+
+      card.addEventListener('click', pick);
+      card.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); }
+      });
+    });
+
+    if (ownsHint) ownsHint.hidden = false;
+  }
+
+  // ── 8 · Decisiones: el reverso entra al pasar el mouse ───────────────
+  //
+  // La cara técnica sale hacia arriba y la explicación en llano entra en
+  // cascada desde abajo (`waterfall-entry`), sobre la misma celda de grid.
+  // Una línea de tiempo pausada por tarjeta: play al entrar, reverse al
+  // salir, así una salida a mitad de camino vuelve por donde vino.
+  var leaderCards = Array.prototype.slice.call(document.querySelectorAll('.leader-card'));
+  if (leaderCards.length) {
+    var leaderHint = document.querySelector('[data-leader-hint]');
+    var noHover = matchMedia('(hover: none)').matches;
+
+    leaderCards.forEach(function (card) {
+      var faceFront = card.querySelector('.lc-front');
+      var faceBack = card.querySelector('.lc-back');
+      if (!faceFront || !faceBack) return;
+
+      gsap.set(faceFront, { opacity: 1 });
+      gsap.set(faceBack, { opacity: 1 });
+      gsap.set(faceBack.children, { opacity: 0, y: 14 });
+
+      var flip = gsap.timeline({ paused: true })
+        .to(faceFront.children, { opacity: 0, y: -10, duration: 0.24, stagger: 0.035, ease: 'power2.in' }, 0)
+        .to(card, { scale: 1.015, duration: 0.4, ease: 'back.out(2)' }, 0)
+        .to(faceBack.children, { opacity: 1, y: 0, duration: 0.42, stagger: 0.07, ease: 'power3.out' }, 0.18);
+
+      var hot = false;
+      function heat() { if (hot) return; hot = true; card.dataset.hot = 'true'; flip.play(); }
+      function cool() { if (!hot) return; hot = false; card.dataset.hot = 'false'; flip.reverse(); }
+
+      // Sin mouse no hay hover: el toque alterna las dos caras. Y en táctil no
+      // se escucha mouseenter, porque un tap lo dispara y cancelaría el toggle.
+      if (noHover) {
+        card.addEventListener('click', function () { hot ? cool() : heat(); });
+      } else {
+        card.addEventListener('mouseenter', heat);
+        card.addEventListener('mouseleave', cool);
+        card.addEventListener('focusin', heat);
+        card.addEventListener('focusout', cool);
+      }
+    });
+
+    if (leaderHint) {
+      leaderHint.textContent = noHover
+        ? 'Toca una tarjeta para ver qué significa en la práctica.'
+        : 'Pasa el mouse por una tarjeta para ver qué significa en la práctica.';
+    }
   }
 
   ScrollTrigger.refresh();
