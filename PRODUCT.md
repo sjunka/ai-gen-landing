@@ -71,13 +71,14 @@ copiar sin copiar la especificación entera.
 
 ## Evidence on Hand
 
-- `assets/photo.jpg` y `assets/generated.jpg`: el par antes/después real del
-  héroe. La imagen generada salió de Higgsfield (`soul_2`) usando la foto como
-  referencia el 2026-08-18.
-- `assets/video.mp4`, `shot-capture.jpg`, `shot-result.jpg`, `shot-video.jpg` y
-  `og.jpg` son **archivos de relleno**, no capturas reales.
-  Hay que reemplazarlos con material del producto antes de presentar; nada de
-  lo que se diga de ellos puede presentarse como una captura real.
+- `assets/photo.jpg`, `assets/generated.jpg` y `assets/video.mp4`: la cadena
+  real del héroe. `generated.jpg` salió de Higgsfield (`soul_2`), `video.mp4`
+  de Higgsfield (`seedance_2_5`, omni_reference), usando la foto como
+  referencia el 2026-08-19.
+- `shot-capture.jpg`, `shot-result.jpg`, `shot-video.jpg` y `og.jpg` son
+  **mockups de interfaz generados con Higgsfield** (`nano_banana_pro`), no
+  capturas reales de la app — la app vive en otro repositorio y no hay acceso
+  de navegador aquí para capturarla. No presentar como capturas reales.
 - Los números de la landing (39 tickets, 5 fases, 4 personas, 80 archivos de
   código, 0 escritos a mano) salen del repositorio.
 - No hay testimonios, clientes, precios ni benchmarks. No inventar ninguno.

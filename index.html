@@ -218,11 +218,11 @@ a { color: inherit; }
 /* ── §6 · El momento firma: la tubería del héroe ──────────────────────── */
 .pipe { margin-top: 64px; position: relative; isolation: isolate; }
 .pipe-frame {
-  position: relative; z-index: 1; margin-inline: auto; max-width: 560px;
+  position: relative; z-index: 1; margin-inline: auto; max-width: 420px;
   background: var(--color-surface-2);
   border: 1px solid var(--color-hairline);
   border-radius: 24px; overflow: hidden;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 3 / 4;
   box-shadow: var(--shadow-lift);
 }
 /* El orbe detrás del marco cambia de tono con el estado real del producto. */
@@ -237,10 +237,11 @@ a { color: inherit; }
 .pipe[data-state="photo"]::before { background: radial-gradient(circle, var(--color-orb-sky), transparent 66%); }
 .pipe[data-state="generated"]::before { background: radial-gradient(circle, var(--color-orb-peach), transparent 66%); }
 
-.pipe-frame > img, .pipe-frame > video {
+.pipe-frame > img, .pipe-frame > video, .pipe-frame > picture {
   position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
   opacity: 0; transition: opacity 700ms ease-out;
 }
+.pipe-frame > picture > img { width: 100%; height: 100%; object-fit: cover; }
 .pipe-status {
   position: absolute; left: 14px; top: 14px; z-index: 2;
   display: flex; align-items: center; gap: 8px;
@@ -472,9 +473,12 @@ a { color: inherit; }
             <span class="badge" id="pipe-badge" data-variant="success">Listo</span>
             <span class="pipe-count" id="pipe-count">Generando... 4s</span>
           </div>
-          <img data-step="photo" src="assets/photo.jpg" width="520" height="520" alt="La foto original, tomada con el celular." fetchpriority="high" decoding="async">
-          <img data-step="generated" src="assets/generated.jpg" width="520" height="520" alt="La imagen que la IA generó a partir de esa foto." fetchpriority="high" decoding="async">
-          <video data-step="video" id="pipe-video" width="520" height="520" muted playsinline loop poster="assets/generated.jpg" aria-label="El video corto generado a partir de la imagen: un movimiento de cámara suave sobre la misma escena.">
+          <img data-step="photo" src="assets/photo.jpg" width="420" height="560" alt="La foto original, tomada con el celular." fetchpriority="high" decoding="async">
+          <picture data-step="generated">
+            <source srcset="assets/generated.webp" type="image/webp">
+            <img src="assets/generated.jpg" width="420" height="560" alt="La imagen que la IA generó a partir de esa foto." fetchpriority="high" decoding="async">
+          </picture>
+          <video data-step="video" id="pipe-video" width="420" height="560" muted playsinline loop poster="assets/generated.jpg" aria-label="El video corto generado a partir de la imagen: un movimiento de cámara suave sobre la misma escena.">
             <source src="assets/video.mp4" type="video/mp4">
           </video>
         </div>
@@ -512,19 +516,22 @@ a { color: inherit; }
           <span class="step-n" aria-hidden="true">01</span>
           <h3 class="heading">Tomas la foto</h3>
           <p class="body-sm">Se abre la cámara trasera. Eliges el ánimo del resultado en una lista.</p>
-          <img class="step-shot" src="assets/shot-capture.jpg" width="360" height="640" loading="lazy" decoding="async" alt="La pantalla de captura con la foto ya tomada, la lista de ánimos y el botón de generar.">
+          <picture><source srcset="assets/shot-capture.webp" type="image/webp">
+          <img class="step-shot" src="assets/shot-capture.jpg" width="402" height="720" loading="lazy" decoding="async" alt="La pantalla de captura con la foto ya tomada, la lista de ánimos y el botón de generar."></picture>
         </li>
         <li class="step enter">
           <span class="step-n" aria-hidden="true">02</span>
           <h3 class="heading">La IA hace la imagen</h3>
           <p class="body-sm">Tu foto entra como referencia, no como descripción. El resultado se parece a lo que fotografiaste.</p>
-          <img class="step-shot" src="assets/shot-result.jpg" width="360" height="640" loading="lazy" decoding="async" alt="La imagen generada en la misma pantalla, con el contador de segundos y el botón de hacer video.">
+          <picture><source srcset="assets/shot-result.webp" type="image/webp">
+          <img class="step-shot" src="assets/shot-result.jpg" width="402" height="720" loading="lazy" decoding="async" alt="La imagen generada en la misma pantalla, con el contador de segundos y el botón de hacer video."></picture>
         </li>
         <li class="step enter">
           <span class="step-n" aria-hidden="true">03</span>
           <h3 class="heading">La imagen se vuelve video</h3>
           <p class="body-sm">Un movimiento de cámara suave. Cuando está listo, lo descargas o lo compartes.</p>
-          <img class="step-shot" src="assets/shot-video.jpg" width="360" height="640" loading="lazy" decoding="async" alt="La pantalla del video reproduciéndose, con descargar y compartir debajo.">
+          <picture><source srcset="assets/shot-video.webp" type="image/webp">
+          <img class="step-shot" src="assets/shot-video.jpg" width="402" height="720" loading="lazy" decoding="async" alt="La pantalla del video reproduciéndose, con descargar y compartir debajo."></picture>
         </li>
       </ol>
     </div>
