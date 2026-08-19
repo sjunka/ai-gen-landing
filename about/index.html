@@ -167,6 +167,30 @@ a { color: inherit; }
 .dg-dot.focal { background: var(--dg-accent-soft); border: 1.5px solid var(--dg-accent); }
 .dg-dot.ext { background: var(--dg-hair-soft); border: 1.5px solid var(--dg-soft); }
 
+/* ── Secuencia: transporte de reproducción ────────────────────────────── */
+.seq-stage { position: relative; }
+.seq-stage .dg-wrap { margin-top: 40px; }
+.seq-transport { margin-top: 18px; display: flex; flex-direction: column; gap: 12px; }
+.seq-transport[hidden] { display: none; }
+.seq-transport-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.seq-btn { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; flex: none; padding: 0; border-radius: 9999px; border: 1px solid var(--color-hairline-strong); background: var(--color-surface-2); color: var(--color-ink); cursor: pointer; transition: border-color 140ms ease, background-color 140ms ease, transform 140ms ease; }
+.seq-btn:hover { border-color: var(--color-ink); }
+.seq-btn:active { transform: scale(0.94); }
+.seq-btn-primary { background: var(--color-primary); border-color: var(--color-primary); color: var(--color-on-primary); width: 46px; height: 46px; }
+.seq-btn-primary:hover { background: var(--color-primary-hover); border-color: var(--color-primary-hover); }
+.seq-ico { width: 16px; height: 16px; display: block; }
+.seq-btn-primary .seq-ico { width: 18px; height: 18px; }
+.seq-readout { display: flex; flex-direction: column; gap: 2px; margin-left: 8px; min-width: 0; }
+.seq-step { font-size: 12px; letter-spacing: 0.08em; color: var(--color-ink); }
+.seq-say { color: var(--color-ink-subtle); }
+.seq-rail { display: flex; gap: 4px; align-items: stretch; }
+.seq-rail button { flex: 1 1 0; height: 16px; padding: 0; border: 0; background: none; cursor: pointer; position: relative; }
+.seq-rail button::after { content: ""; position: absolute; left: 0; right: 0; top: 7px; height: 2px; border-radius: 2px; background: var(--color-hairline-strong); transition: background-color 160ms ease, height 160ms ease, top 160ms ease; }
+.seq-rail button[data-state="past"]::after { background: var(--color-ink-tertiary); }
+.seq-rail button[data-state="now"]::after { background: var(--color-primary); height: 4px; top: 6px; }
+.seq-rail button:hover::after { background: var(--color-ink); }
+@media (min-width: 720px) { .seq-readout { flex-direction: row; align-items: baseline; gap: 10px; } }
+
 .tech-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 28px 36px; margin-top: 44px; padding-top: 28px; border-top: 1px solid var(--color-hairline); }
 .tech-item { display: flex; align-items: center; gap: 10px; }
 .tech-item img { width: 22px; height: 22px; object-fit: contain; }
@@ -271,6 +295,14 @@ a { color: inherit; }
 </head>
 
 <body>
+<!-- Sprite de iconos: Lucide (ISC), incrustado — sin CDN, sin dependencia extra -->
+<svg class="ico-sprite" aria-hidden="true" focusable="false" width="0" height="0" style="position:absolute">
+  <symbol id="ico-play" viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3" fill="currentColor"/></symbol>
+  <symbol id="ico-pause" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1" fill="currentColor"/><rect x="14" y="4" width="4" height="16" rx="1" fill="currentColor"/></symbol>
+  <symbol id="ico-skip-back" viewBox="0 0 24 24"><polygon points="19 20 9 12 19 4 19 20" fill="currentColor"/><rect x="4" y="4" width="2" height="16" rx="1" fill="currentColor"/></symbol>
+  <symbol id="ico-skip-forward" viewBox="0 0 24 24"><polygon points="5 4 15 12 5 20 5 4" fill="currentColor"/><rect x="18" y="4" width="2" height="16" rx="1" fill="currentColor"/></symbol>
+  <symbol id="ico-rotate-ccw" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></g></symbol>
+</svg>
 <a class="skip" href="#contenido">Saltar al contenido</a>
 
 <header class="topbar">
@@ -545,18 +577,29 @@ a { color: inherit; }
       <div class="section-head reveal">
         <span class="label">UML · Diagrama de secuencia</span>
         <h2 id="seq-h" class="display-md">Este es el diagrama de barritas.</h2>
-        <p class="body">Cada columna es una <b class="muted">lifeline</b>: la vida de un actor en el tiempo, de arriba abajo. El rectángulo angosto sobre la línea es la <b class="muted">activation bar</b> — cuándo ese actor tiene el control. Haz scroll: los mensajes se activan paso a paso, en el orden real en que ocurren.</p>
+        <p class="body">Cada columna es una <b class="muted">lifeline</b>: la vida de un actor en el tiempo, de arriba abajo. El rectángulo angosto sobre la línea es la <b class="muted">activation bar</b> — cuándo ese actor tiene el control. Dale play: cada mensaje se dibuja en el orden real en que ocurre, con el paquete viajando por el cable. Pausa, adelanta o salta a cualquier paso.</p>
       </div>
 
-      <div class="dg-wrap">
+      <div class="seq-stage">
+        <div class="dg-wrap">
         <svg class="dg" data-sequence="true" viewBox="0 0 640 640" role="img" aria-labelledby="sq-t sq-d">
           <title id="sq-t">Diagrama de secuencia: de una foto a un video</title>
           <desc id="sq-d">El usuario envía la foto y un ánimo a Next.js, que llama a Higgsfield y devuelve la imagen generada. El usuario pide convertirla en video; Next.js inicia el trabajo en Higgsfield y devuelve un identificador. El cliente consulta el estado cada tres segundos, en un bucle, hasta que el video queda listo.</desc>
           <defs>
             <marker id="sq-arrow" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><polygon points="0 0, 9 3.5, 0 7" fill="var(--dg-muted)"/></marker>
             <marker id="sq-arrow-accent" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto"><polygon points="0 0, 9 3.5, 0 7" fill="var(--dg-accent)"/></marker>
+            <radialGradient id="sq-packet-glow">
+              <stop offset="0%" stop-color="var(--dg-accent)" stop-opacity="0.34"/>
+              <stop offset="100%" stop-color="var(--dg-accent)" stop-opacity="0"/>
+            </radialGradient>
           </defs>
           <rect width="100%" height="100%" fill="var(--dg-paper)"/>
+
+          <!-- Playhead: la banda que marca el paso vivo (debajo de todo el contenido) -->
+          <g class="seq-playhead" opacity="0">
+            <rect class="seq-playhead-band" x="18" y="-13" width="604" height="26" rx="4" fill="var(--dg-accent-soft)" opacity="0.55"/>
+            <line class="seq-playhead-rule" x1="18" y1="0" x2="622" y2="0" stroke="var(--dg-accent)" stroke-width="0.8" stroke-dasharray="2,4" opacity="0.5"/>
+          </g>
 
           <!-- Lifelines -->
           <g stroke="var(--dg-hair)" stroke-width="1" stroke-dasharray="3,3">
@@ -567,94 +610,149 @@ a { color: inherit; }
 
           <!-- Actor boxes -->
           <g>
-            <rect x="24" y="18" width="132" height="42" rx="6" fill="var(--dg-surface)" stroke="var(--dg-ink)" stroke-width="1"/>
+            <rect class="seq-actor" data-actor="0" x="24" y="18" width="132" height="42" rx="6" fill="var(--dg-surface)" stroke="var(--dg-ink)" stroke-width="1"/>
             <text x="90" y="43" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--dg-ink)">Usuario</text>
-            <rect x="252" y="18" width="156" height="42" rx="6" fill="var(--dg-surface)" stroke="var(--dg-ink)" stroke-width="1"/>
+            <rect class="seq-actor" data-actor="1" x="252" y="18" width="156" height="42" rx="6" fill="var(--dg-surface)" stroke="var(--dg-ink)" stroke-width="1"/>
             <text x="330" y="38" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--dg-ink)">Next.js</text>
             <text x="330" y="52" text-anchor="middle" class="mono" font-size="8.5" fill="var(--dg-soft)">pantallas + /api</text>
-            <rect x="496" y="18" width="128" height="42" rx="6" fill="var(--dg-accent-soft)" stroke="var(--dg-accent)" stroke-width="1.3"/>
+            <rect class="seq-actor" data-actor="2" x="496" y="18" width="128" height="42" rx="6" fill="var(--dg-accent-soft)" stroke="var(--dg-accent)" stroke-width="1.3"/>
             <text x="560" y="43" text-anchor="middle" font-size="12.5" font-weight="600" fill="var(--dg-ink)">Higgsfield</text>
           </g>
 
-          <!-- Activation bars -->
+          <!-- Activation bars: crecen cuando el actor toma el control (data-step = paso que las abre) -->
           <g fill="rgba(12,10,9,0.05)" stroke="var(--dg-muted)" stroke-width="0.8">
-            <rect x="326" y="90" width="8" height="164"/>
-            <rect x="556" y="126" width="8" height="60"/>
-            <rect x="326" y="290" width="8" height="140"/>
-            <rect x="556" y="326" width="8" height="40"/>
-            <rect x="326" y="480" width="8" height="90"/>
+            <rect class="seq-bar" data-step="0" x="326" y="90" width="8" height="164"/>
+            <rect class="seq-bar" data-step="1" x="556" y="126" width="8" height="60"/>
+            <rect class="seq-bar" data-step="4" x="326" y="290" width="8" height="140"/>
+            <rect class="seq-bar" data-step="5" x="556" y="326" width="8" height="40"/>
+            <rect class="seq-bar" data-step="8" x="326" y="480" width="8" height="90"/>
           </g>
 
           <!-- ── Mensajes: cada <g class="seq-msg"> es un paso ── -->
           <g class="mono" font-size="9.5">
-            <g class="seq-msg">
-              <path d="M90,90 H326" fill="none" stroke="var(--dg-muted)" stroke-width="1.2" marker-end="url(#sq-arrow)"/>
-              <rect x="112" y="76" width="192" height="13" fill="var(--dg-paper)"/>
-              <text x="112" y="86" fill="var(--dg-ink)">POST /api/image {photo, mood}</text>
+            <g class="seq-msg" data-say="El cliente sube la foto y el ánimo elegido">
+              <path class="seq-arrow" d="M90,90 H326" fill="none" stroke="var(--dg-muted)" stroke-width="1.2" marker-end="url(#sq-arrow)"/>
+              <g class="seq-chrome">
+                <rect x="112" y="76" width="192" height="13" fill="var(--dg-paper)"/>
+                <text x="112" y="86" fill="var(--dg-ink)">POST /api/image {photo, mood}</text>
+              </g>
             </g>
-            <g class="seq-msg">
-              <path d="M334,126 H556" fill="none" stroke="var(--dg-muted)" stroke-width="1.2" marker-end="url(#sq-arrow)"/>
-              <rect x="350" y="112" width="196" height="13" fill="var(--dg-paper)"/>
-              <text x="350" y="122" fill="var(--dg-ink)">higgsfield-ai/soul/reference</text>
+            <g class="seq-msg" data-say="Next.js reenvía el trabajo al modelo de imagen">
+              <path class="seq-arrow" d="M334,126 H556" fill="none" stroke="var(--dg-muted)" stroke-width="1.2" marker-end="url(#sq-arrow)"/>
+              <g class="seq-chrome">
+                <rect x="350" y="112" width="196" height="13" fill="var(--dg-paper)"/>
+                <text x="350" y="122" fill="var(--dg-ink)">higgsfield-ai/soul/reference</text>
+              </g>
             </g>
-            <g class="seq-msg">
-              <path d="M556,162 H334" fill="none" stroke="var(--dg-muted)" stroke-width="1.1" stroke-dasharray="5,4" marker-end="url(#sq-arrow)"/>
-              <rect x="380" y="148" width="120" height="13" fill="var(--dg-paper)"/>
-              <text x="440" y="158" text-anchor="middle" fill="var(--dg-muted)">imageUrl</text>
+            <g class="seq-msg" data-say="Higgsfield devuelve la URL de la imagen">
+              <path class="seq-arrow" d="M556,162 H334" fill="none" stroke="var(--dg-muted)" stroke-width="1.1" stroke-dasharray="5,4" marker-end="url(#sq-arrow)"/>
+              <g class="seq-chrome">
+                <rect x="380" y="148" width="120" height="13" fill="var(--dg-paper)"/>
+                <text x="440" y="158" text-anchor="middle" fill="var(--dg-muted)">imageUrl</text>
+              </g>
             </g>
-            <g class="seq-msg">
-              <path d="M326,232 H90" fill="none" stroke="var(--dg-accent)" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#sq-arrow-accent)"/>
-              <rect x="128" y="196" width="160" height="30" fill="var(--dg-paper)"/>
-              <text x="130" y="208" fill="var(--dg-accent)" font-weight="700">200 {imageUrl}</text>
-              <text x="130" y="221" fill="var(--dg-soft)">primer resultado real</text>
+            <g class="seq-msg" data-say="Primer resultado real de vuelta en pantalla">
+              <path class="seq-arrow" d="M326,232 H90" fill="none" stroke="var(--dg-accent)" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#sq-arrow-accent)"/>
+              <g class="seq-chrome">
+                <rect x="128" y="196" width="160" height="30" fill="var(--dg-paper)"/>
+                <text x="130" y="208" fill="var(--dg-accent)" font-weight="700">200 {imageUrl}</text>
+                <text x="130" y="221" fill="var(--dg-soft)">primer resultado real</text>
+              </g>
             </g>
 
-            <g class="seq-msg">
-              <path d="M90,290 H326" fill="none" stroke="var(--dg-muted)" stroke-width="1.2" marker-end="url(#sq-arrow)"/>
-              <rect x="112" y="276" width="188" height="13" fill="var(--dg-paper)"/>
-              <text x="112" y="286" fill="var(--dg-ink)">POST /api/video {imageUrl}</text>
+            <g class="seq-msg" data-say="El usuario pide convertir esa imagen en video">
+              <path class="seq-arrow" d="M90,290 H326" fill="none" stroke="var(--dg-muted)" stroke-width="1.2" marker-end="url(#sq-arrow)"/>
+              <g class="seq-chrome">
+                <rect x="112" y="276" width="188" height="13" fill="var(--dg-paper)"/>
+                <text x="112" y="286" fill="var(--dg-ink)">POST /api/video {imageUrl}</text>
+              </g>
             </g>
-            <g class="seq-msg">
-              <path d="M334,326 H556" fill="none" stroke="var(--dg-muted)" stroke-width="1.2" marker-end="url(#sq-arrow)"/>
-              <rect x="350" y="312" width="196" height="13" fill="var(--dg-paper)"/>
-              <text x="350" y="322" fill="var(--dg-ink)">higgsfield-ai/dop/{calidad}</text>
+            <g class="seq-msg" data-say="Next.js arranca el trabajo de video">
+              <path class="seq-arrow" d="M334,326 H556" fill="none" stroke="var(--dg-muted)" stroke-width="1.2" marker-end="url(#sq-arrow)"/>
+              <g class="seq-chrome">
+                <rect x="350" y="312" width="196" height="13" fill="var(--dg-paper)"/>
+                <text x="350" y="322" fill="var(--dg-ink)">higgsfield-ai/dop/{calidad}</text>
+              </g>
             </g>
-            <g class="seq-msg">
-              <path d="M556,360 H334" fill="none" stroke="var(--dg-muted)" stroke-width="1.1" stroke-dasharray="5,4" marker-end="url(#sq-arrow)"/>
-              <rect x="390" y="346" width="100" height="13" fill="var(--dg-paper)"/>
-              <text x="440" y="356" text-anchor="middle" fill="var(--dg-muted)">jobId</text>
+            <g class="seq-msg" data-say="Higgsfield responde con el identificador del trabajo">
+              <path class="seq-arrow" d="M556,360 H334" fill="none" stroke="var(--dg-muted)" stroke-width="1.1" stroke-dasharray="5,4" marker-end="url(#sq-arrow)"/>
+              <g class="seq-chrome">
+                <rect x="390" y="346" width="100" height="13" fill="var(--dg-paper)"/>
+                <text x="440" y="356" text-anchor="middle" fill="var(--dg-muted)">jobId</text>
+              </g>
             </g>
-            <g class="seq-msg">
-              <path d="M326,410 H90" fill="none" stroke="var(--dg-muted)" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#sq-arrow)"/>
-              <rect x="118" y="396" width="176" height="13" fill="var(--dg-paper)"/>
-              <text x="120" y="406" fill="var(--dg-ink)">200 {jobId} → /result</text>
+            <g class="seq-msg" data-say="El cliente recibe el jobId y navega a /result">
+              <path class="seq-arrow" d="M326,410 H90" fill="none" stroke="var(--dg-muted)" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#sq-arrow)"/>
+              <g class="seq-chrome">
+                <rect x="118" y="396" width="176" height="13" fill="var(--dg-paper)"/>
+                <text x="120" y="406" fill="var(--dg-ink)">200 {jobId} → /result</text>
+              </g>
             </g>
           </g>
 
           <!-- Fragmento loop -->
-          <rect x="66" y="452" width="284" height="126" rx="4" fill="rgba(12,10,9,0.02)" stroke="var(--dg-hair)" stroke-width="1"/>
-          <rect x="66" y="452" width="44" height="16" rx="2" fill="var(--dg-paper)" stroke="var(--dg-hair)" stroke-width="1"/>
-          <text x="88" y="464" text-anchor="middle" class="mono" font-size="8" letter-spacing="0.1em" fill="var(--dg-muted)">LOOP</text>
-          <text x="120" y="464" class="mono" font-size="8.5" fill="var(--dg-soft)">[cada 3s, hasta status = ready]</text>
+          <g class="seq-loop" opacity="0.35">
+            <rect class="seq-loop-box" x="66" y="452" width="284" height="126" rx="4" fill="rgba(12,10,9,0.02)" stroke="var(--dg-hair)" stroke-width="1"/>
+            <rect x="66" y="452" width="44" height="16" rx="2" fill="var(--dg-paper)" stroke="var(--dg-hair)" stroke-width="1"/>
+            <text x="88" y="464" text-anchor="middle" class="mono" font-size="8" letter-spacing="0.1em" fill="var(--dg-muted)">LOOP</text>
+            <text x="120" y="464" class="mono" font-size="8.5" fill="var(--dg-soft)">[cada 3s, hasta status = ready]</text>
+          </g>
 
           <g class="mono" font-size="9.5">
-            <g class="seq-msg">
-              <path d="M90,500 H326" fill="none" stroke="var(--dg-muted)" stroke-width="1.1" marker-end="url(#sq-arrow)"/>
-              <rect x="108" y="486" width="164" height="13" fill="var(--dg-paper)"/>
-              <text x="110" y="496" fill="var(--dg-ink)">GET /api/video/[id]</text>
+            <g class="seq-msg" data-say="El cliente pregunta por el estado, cada tres segundos">
+              <path class="seq-arrow" d="M90,500 H326" fill="none" stroke="var(--dg-muted)" stroke-width="1.1" marker-end="url(#sq-arrow)"/>
+              <g class="seq-chrome">
+                <rect x="108" y="486" width="164" height="13" fill="var(--dg-paper)"/>
+                <text x="110" y="496" fill="var(--dg-ink)">GET /api/video/[id]</text>
+              </g>
             </g>
-            <g class="seq-msg">
-              <path d="M326,548 H90" fill="none" stroke="var(--dg-muted)" stroke-width="1.1" stroke-dasharray="5,4" marker-end="url(#sq-arrow)"/>
-              <rect x="130" y="534" width="156" height="13" fill="var(--dg-paper)"/>
-              <text x="132" y="544" fill="var(--dg-ink)">{status: pending → ready}</text>
+            <g class="seq-msg" data-say="La misma respuesta se repite hasta que cambia a ready">
+              <path class="seq-arrow" d="M326,548 H90" fill="none" stroke="var(--dg-muted)" stroke-width="1.1" stroke-dasharray="5,4" marker-end="url(#sq-arrow)"/>
+              <g class="seq-chrome">
+                <rect x="130" y="534" width="156" height="13" fill="var(--dg-paper)"/>
+                <text x="132" y="544" fill="var(--dg-ink)">{status: pending → ready}</text>
+              </g>
             </g>
           </g>
 
-          <g class="seq-msg">
-            <text x="90" y="600" text-anchor="middle" font-size="10.5" font-weight="600" fill="var(--dg-accent)">▶ reproduce inline</text>
+          <g class="seq-msg" data-say="El video queda listo y se reproduce en la misma pantalla">
+            <g class="seq-chrome">
+              <text x="90" y="600" text-anchor="middle" font-size="10.5" font-weight="600" fill="var(--dg-accent)">▶ reproduce inline</text>
+            </g>
+          </g>
+
+          <!-- Paquete en vuelo: viaja por el cable mientras el mensaje se dibuja -->
+          <g class="seq-packet" opacity="0">
+            <circle class="seq-packet-halo" r="11" fill="url(#sq-packet-glow)"/>
+            <circle class="seq-packet-dot" r="3.1" fill="var(--dg-accent)"/>
           </g>
         </svg>
+        </div>
+
+        <!-- Transporte: play / pausa / paso a paso. Sólo aparece con JS. -->
+        <div class="seq-transport" data-seq-transport hidden>
+          <div class="seq-transport-row">
+            <button type="button" class="seq-btn" data-seq="prev" aria-label="Paso anterior">
+              <svg class="seq-ico" aria-hidden="true"><use href="#ico-skip-back"></use></svg>
+            </button>
+            <button type="button" class="seq-btn seq-btn-primary" data-seq="toggle" aria-label="Reproducir la secuencia">
+              <svg class="seq-ico" data-seq-icon aria-hidden="true"><use href="#ico-play"></use></svg>
+            </button>
+            <button type="button" class="seq-btn" data-seq="next" aria-label="Paso siguiente">
+              <svg class="seq-ico" aria-hidden="true"><use href="#ico-skip-forward"></use></svg>
+            </button>
+            <button type="button" class="seq-btn" data-seq="restart" aria-label="Volver al inicio">
+              <svg class="seq-ico" aria-hidden="true"><use href="#ico-rotate-ccw"></use></svg>
+            </button>
+            <div class="seq-readout">
+              <span class="seq-step mono" data-seq-step>00 / 11</span>
+              <span class="seq-say caption" data-seq-say>Listo para reproducir</span>
+            </div>
+          </div>
+          <div class="seq-rail" data-seq-rail role="group" aria-label="Ir a un paso de la secuencia"></div>
+        </div>
       </div>
+
       <div class="dg-legend">
         <div class="dg-legend-item"><span class="dg-swatch solid"></span><span class="caption">Llamada (espera respuesta)</span></div>
         <div class="dg-legend-item"><span class="dg-swatch dashed"></span><span class="caption">Retorno</span></div>
@@ -1008,20 +1106,206 @@ a { color: inherit; }
     });
   });
 
-  // ── 5 · Secuencia: los mensajes se activan paso a paso con el scroll ──
+  // ── 5 · Secuencia: una sola línea de tiempo pausada, con transporte ──
+  //
+  // Reglas HyperFrames compuestas aquí: `svg-path-draw` (cada flecha se traza
+  // con stroke-dashoffset medido, no adivinado), `chart-scrub-readout` (un
+  // driver único mueve el playhead y el paquete; el texto sólo se escribe
+  // cuando cambia el índice) y `press-release-spring` (el chrome del mensaje
+  // entra con back.out). La línea es *seek-safe*: el fotograma en t es función
+  // pura de t, así que saltar a cualquier paso pinta exactamente lo mismo.
   var seq = document.querySelector('[data-sequence]');
-  if (seq) {
-    var msgs = seq.querySelectorAll('.seq-msg');
-    var actors = seq.querySelectorAll('.dg-node, defs, title, desc');
-    gsap.set(msgs, { opacity: 0.15 });
-    ScrollTrigger.create({
-      trigger: seq, start: 'top 65%', end: 'bottom 75%', scrub: 0.5,
-      onUpdate: function (self) {
-        var idx = Math.floor(self.progress * msgs.length);
-        msgs.forEach(function (m, i) {
-          gsap.to(m, { opacity: i <= idx ? 1 : 0.15, duration: 0.15, overwrite: 'auto' });
-        });
+  var transport = document.querySelector('[data-seq-transport]');
+  if (seq && transport) {
+    var STEP = 1.05;          // segundos por paso
+    var DRAW = 0.62;          // duración del trazo de la flecha
+    var DIM = 0.16;           // opacidad de un mensaje que aún no ocurrió
+    var PAST = 0.46;          // opacidad de un mensaje ya ocurrido
+
+    var msgs = Array.prototype.slice.call(seq.querySelectorAll('.seq-msg'));
+    var bars = Array.prototype.slice.call(seq.querySelectorAll('.seq-bar'));
+    var loop = seq.querySelector('.seq-loop');
+    var playhead = seq.querySelector('.seq-playhead');
+    var packet = seq.querySelector('.seq-packet');
+    var actors = Array.prototype.slice.call(seq.querySelectorAll('.seq-actor'));
+
+    // Geometría medida una vez, al construir. Nunca durante un tween.
+    var steps = msgs.map(function (msg) {
+      var path = msg.querySelector('.seq-arrow');
+      var len = path ? path.getTotalLength() : 0;
+      var a = path ? path.getPointAtLength(0) : { x: 90, y: 600 };
+      var b = path ? path.getPointAtLength(len) : a;
+      return { msg: msg, path: path, len: len, from: a, to: b, y: a.y, say: msg.dataset.say || '' };
+    });
+
+    steps.forEach(function (st) {
+      if (!st.path) return;
+      st.path.style.strokeDasharray = st.len;
+      st.path.style.strokeDashoffset = st.len;
+      // La punta de flecha es un marker: se pinta aunque el trazo esté oculto.
+      // La apagamos y la encendemos al cerrar el trazo, en ambos sentidos.
+      st.marker = st.path.getAttribute('marker-end');
+      st.path.setAttribute('marker-end', 'none');
+      // El trazo progresivo usa el dasharray como máscara, así que pisa el
+      // guionado semántico (retorno). Lo devolvemos al cerrar el trazo.
+      st.dash = st.path.getAttribute('stroke-dasharray') || 'none';
+    });
+
+    gsap.set(msgs, { opacity: DIM });
+    gsap.set(msgs.map(function (m) { return m.querySelector('.seq-chrome'); }), { opacity: 0 });
+    bars.forEach(function (bar) {
+      gsap.set(bar, { scaleY: 0, svgOrigin: (+bar.getAttribute('x') + 4) + ' ' + bar.getAttribute('y') });
+    });
+
+    var tl = gsap.timeline({ paused: true });
+
+    steps.forEach(function (st, i) {
+      var at = i * STEP;
+
+      // El mensaje sube a foco; el anterior baja a "ya ocurrió".
+      tl.to(st.msg, { opacity: 1, duration: 0.22, ease: 'power2.out' }, at);
+      if (i > 0) tl.to(steps[i - 1].msg, { opacity: PAST, duration: 0.3, ease: 'power2.out' }, at);
+
+      // Barra de activación que abre en este paso: crece desde arriba.
+      bars.filter(function (b) { return +b.dataset.step === i; })
+          .forEach(function (b) { tl.to(b, { scaleY: 1, duration: 0.4, ease: 'power2.out' }, at); });
+
+      // El marco LOOP se enciende cuando entra su primer mensaje.
+      if (loop && i === 8) tl.to(loop, { opacity: 1, duration: 0.35, ease: 'power2.out' }, at);
+
+      // Playhead: la banda viaja al renglón del paso vivo.
+      tl.to(playhead, { y: st.y, duration: 0.42, ease: 'power2.inOut' }, at);
+      if (i === 0) tl.to(playhead, { opacity: 1, duration: 0.3 }, at);
+
+      if (st.path) {
+        // La flecha se dibuja...
+        tl.set(st.path, { attr: { 'marker-end': 'none' }, strokeDasharray: st.len }, at + 0.06);
+        tl.to(st.path, { strokeDashoffset: 0, duration: DRAW, ease: 'power2.out' }, at + 0.06);
+        tl.set(st.path, { attr: { 'marker-end': st.marker } }, at + 0.06 + DRAW * 0.86);
+        tl.set(st.path, { strokeDasharray: st.dash, strokeDashoffset: 0 }, at + 0.06 + DRAW);
+        // ...y el paquete la recorre en el mismo tramo, leyendo la geometría
+        // ya medida (posición = función pura del progreso, nunca del DOM vivo).
+        var trip = { p: 0 };
+        tl.fromTo(trip, { p: 0 }, {
+          p: 1, duration: DRAW, ease: 'power2.out',
+          onUpdate: function () {
+            var pt = st.path.getPointAtLength(trip.p * st.len);
+            packet.setAttribute('transform', 'translate(' + pt.x + ',' + pt.y + ')');
+          }
+        }, at + 0.06);
+        tl.fromTo(packet, { opacity: 0 }, { opacity: 1, duration: 0.12, ease: 'power1.out' }, at + 0.06);
+        tl.to(packet, { opacity: 0, duration: 0.18, ease: 'power1.in' }, at + 0.06 + DRAW - 0.1);
+
+        // Los dos actores del mensaje laten cuando el paquete llega.
+        var hit = [st.from.x, st.to.x].map(function (x) {
+          return actors.filter(function (a) {
+            var ax = +a.getAttribute('x'), aw = +a.getAttribute('width');
+            return x >= ax - 12 && x <= ax + aw + 12;
+          })[0];
+        }).filter(Boolean);
+        if (hit.length) {
+          tl.fromTo(hit, { scale: 1 }, {
+            scale: 1.035, duration: 0.16, ease: 'power1.in', transformOrigin: '50% 50%'
+          }, at + 0.06 + DRAW - 0.16);
+          tl.to(hit, { scale: 1, duration: 0.34, ease: 'back.out(2.4)' }, at + 0.06 + DRAW + 0.02);
+        }
       }
+
+      // El chrome (etiqueta) entra con resorte al terminar el trazo.
+      var chrome = st.msg.querySelector('.seq-chrome');
+      tl.fromTo(chrome, { opacity: 0, y: 5 }, {
+        opacity: 1, y: 0, duration: 0.34, ease: 'back.out(2.2)'
+      }, at + (st.path ? DRAW * 0.7 : 0.1));
+    });
+
+    // Coda: el cuadro final deja el diagrama completo y legible, sin playhead.
+    var END = steps.length * STEP - 0.25;
+    tl.to(msgs, { opacity: 1, duration: 0.5, ease: 'power2.out', stagger: 0.025 }, END);
+    tl.to(playhead, { opacity: 0, duration: 0.4, ease: 'power2.out' }, END);
+
+    // ── Transporte ──────────────────────────────────────────────────────
+    var stepEl = transport.querySelector('[data-seq-step]');
+    var sayEl = transport.querySelector('[data-seq-say]');
+    var toggle = transport.querySelector('[data-seq="toggle"]');
+    var toggleIco = toggle.querySelector('use');
+    var rail = transport.querySelector('[data-seq-rail]');
+    var total = steps.length;
+    var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+
+    var ticks = steps.map(function (st, i) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.setAttribute('aria-label', 'Paso ' + (i + 1) + ': ' + st.say);
+      b.addEventListener('click', function () { goTo(i); });
+      rail.appendChild(b);
+      return b;
+    });
+
+    // Lectura del estado: índice derivado del tiempo, nunca de un contador mutable.
+    var lastIdx = -1;
+    function renderReadout() {
+      var idx = Math.min(total - 1, Math.floor(tl.time() / STEP));
+      if (idx === lastIdx) return;
+      lastIdx = idx;
+      stepEl.textContent = pad(idx + 1) + ' / ' + pad(total);
+      sayEl.textContent = steps[idx].say;
+      ticks.forEach(function (b, i) {
+        b.dataset.state = i < idx ? 'past' : (i === idx ? 'now' : 'next');
+      });
+    }
+    tl.eventCallback('onUpdate', renderReadout);
+
+    // seek() suprime callbacks por defecto: tras cualquier salto, repintamos a mano.
+    function goTo(i) {
+      tl.pause();
+      tl.seek(i * STEP + STEP * 0.9);
+      renderReadout();
+      syncButton();
+    }
+
+    function syncButton() {
+      var done = tl.progress() === 1;
+      var playing = !tl.paused() && !done;
+      toggleIco.setAttribute('href', playing ? '#ico-pause' : (done ? '#ico-rotate-ccw' : '#ico-play'));
+      toggle.setAttribute('aria-label', playing ? 'Pausar la secuencia' : (done ? 'Repetir la secuencia' : 'Reproducir la secuencia'));
+      toggle.setAttribute('aria-pressed', playing ? 'true' : 'false');
+    }
+
+    // Un pause manual manda: si el usuario para, no la revivimos al volver a vista.
+    var userPaused = false;
+    toggle.addEventListener('click', function () {
+      if (!tl.paused() && tl.progress() < 1) tl.pause();
+      else if (tl.progress() === 1) tl.restart();
+      else tl.play();
+      userPaused = tl.paused();
+      syncButton();
+    });
+    transport.querySelector('[data-seq="restart"]').addEventListener('click', function () {
+      userPaused = true;
+      tl.pause(); tl.seek(0); renderReadout(); syncButton();
+    });
+    transport.querySelector('[data-seq="prev"]').addEventListener('click', function () {
+      userPaused = true;
+      goTo(Math.max(0, Math.min(total - 1, Math.floor(tl.time() / STEP)) - 1));
+    });
+    transport.querySelector('[data-seq="next"]').addEventListener('click', function () {
+      userPaused = true;
+      goTo(Math.min(total - 1, Math.floor(tl.time() / STEP) + 1));
+    });
+    tl.eventCallback('onComplete', syncButton);
+
+    transport.hidden = false;
+    renderReadout();
+    syncButton();
+
+    // Arranca sola al entrar en vista; se pausa al salir para no gastar cuadros
+    // fuera de pantalla.
+    ScrollTrigger.create({
+      trigger: seq, start: 'top 72%', end: 'bottom 20%',
+      onEnter: function () { tl.play(); syncButton(); },
+      onEnterBack: function () { if (!userPaused && tl.progress() < 1) { tl.play(); syncButton(); } },
+      onLeave: function () { tl.pause(); syncButton(); },
+      onLeaveBack: function () { tl.pause(); syncButton(); }
     });
   }
 
