@@ -170,6 +170,7 @@ a { color: inherit; }
 .tech-strip { display: flex; flex-wrap: wrap; align-items: center; gap: 28px 36px; margin-top: 44px; padding-top: 28px; border-top: 1px solid var(--color-hairline); }
 .tech-item { display: flex; align-items: center; gap: 10px; }
 .tech-item img { width: 22px; height: 22px; object-fit: contain; }
+.tech-item .logo-hf { border-radius: 5px; }
 .tech-item .logo-chip { width: auto; height: 22px; padding: 0 8px; border-radius: 4px; border: 1px solid var(--color-hairline-strong); display: inline-flex; align-items: center; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; color: var(--color-ink-muted); }
 .tech-item span { font-size: 14px; color: var(--color-ink-muted); }
 .tech-item b { color: var(--color-ink); font-weight: 500; }
@@ -178,6 +179,19 @@ a { color: inherit; }
 .callout p { font-family: var(--font-display); font-style: italic; font-size: 17px; line-height: 1.5; color: var(--color-ink-muted); max-width: 58ch; }
 
 /* ── El método: tarjetas Owns / Never touches ─────────────────────────── */
+/* ── El ciclo de Spec Kit: tabla animada, comando → archivo ───────────── */
+.cycle-wrap { margin-top: 40px; overflow-x: auto; }
+.cycle-table { width: 100%; border-collapse: collapse; min-width: 640px; }
+.cycle-table th { text-align: left; font-family: var(--font-mono); font-size: 10.5px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-ink-tertiary); padding: 0 16px 12px 0; border-bottom: 1px solid var(--color-hairline-strong); }
+.cycle-table td { padding: 18px 16px 18px 0; border-bottom: 1px solid var(--color-hairline); vertical-align: top; font-size: 14px; line-height: 1.5; color: var(--color-ink-muted); }
+.cycle-table td.cmd { font-size: 13px; color: var(--color-ink); font-weight: 500; white-space: nowrap; }
+.cycle-table tr[data-focal="true"] td.cmd { color: var(--color-primary); font-weight: 700; }
+.file-chip { display: inline-block; font-size: 12px; color: var(--color-ink-muted); background: var(--color-surface-3); border: 1px solid var(--color-hairline-strong); border-radius: 6px; padding: 5px 9px; white-space: nowrap; }
+
+/* ── Dos copias del repo ───────────────────────────────────────────────── */
+.copies-grid { display: grid; gap: 16px; margin-top: 40px; }
+@media (min-width: 640px) { .copies-grid { grid-template-columns: repeat(2, 1fr); } }
+
 .owns-grid { display: grid; gap: 16px; margin-top: 40px; }
 .owns-card { background: var(--color-surface-2); border: 1px solid var(--color-hairline); border-radius: 12px; padding: 20px; box-shadow: var(--shadow-soft); }
 .owns-card header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
@@ -275,7 +289,9 @@ a { color: inherit; }
         <a class="btn btn-tertiary" href="#casos-de-uso">Casos de uso</a>
         <a class="btn btn-tertiary" href="#arquitectura">Arquitectura</a>
         <a class="btn btn-tertiary" href="#secuencia">Secuencia</a>
+        <a class="btn btn-tertiary" href="#ciclo-speckit">Ciclo Spec Kit</a>
         <a class="btn btn-tertiary" href="#metodo">El método</a>
+        <a class="btn btn-tertiary" href="#dos-copias">Dos copias</a>
       </div>
     </div>
   </section>
@@ -472,7 +488,8 @@ a { color: inherit; }
           </g>
           <g class="dg-node">
             <rect x="522" y="332" width="150" height="80" rx="8" fill="var(--dg-accent-soft)" stroke="var(--dg-accent)" stroke-width="1.4"/>
-            <text x="536" y="360" font-size="12" font-weight="700" fill="var(--dg-ink)">Higgsfield</text>
+            <image href="../assets/about/logos/higgsfield.png" x="536" y="344" width="20" height="20"/>
+            <text x="564" y="360" font-size="12" font-weight="700" fill="var(--dg-ink)">Higgsfield</text>
             <text x="536" y="378" class="mono" font-size="8.5" fill="var(--dg-muted)">único proveedor:</text>
             <text x="536" y="390" class="mono" font-size="8.5" fill="var(--dg-muted)">soul · dop lite/std/turbo</text>
             <text x="536" y="402" class="mono" font-size="8.5" fill="var(--dg-muted)">imagen y video</text>
@@ -502,7 +519,7 @@ a { color: inherit; }
         <div class="tech-item"><img src="../assets/about/logos/clerk.svg" alt="" loading="lazy"><span><b>Clerk</b> 7</span></div>
         <div class="tech-item"><img src="../assets/about/logos/mongodb.svg" alt="" loading="lazy"><span><b>MongoDB</b> driver 7</span></div>
         <div class="tech-item"><img src="../assets/about/logos/vercel.svg" alt="" loading="lazy"><span><b>Vercel</b> Blob 2</span></div>
-        <div class="tech-item"><span class="logo-chip">AI</span><span><b>Higgsfield</b></span></div>
+        <div class="tech-item"><img src="../assets/about/logos/higgsfield.png" alt="" loading="lazy" class="logo-hf"><span><b>Higgsfield</b></span></div>
         <div class="tech-item"><img src="../assets/about/logos/github.svg" alt="" loading="lazy"><span><b>GitHub</b> Spec Kit</span></div>
         <div class="tech-item"><img src="../assets/about/logos/anthropic.svg" alt="" loading="lazy"><span><b>Claude Code</b> construye</span></div>
       </div>
@@ -635,7 +652,55 @@ a { color: inherit; }
     </div>
   </section>
 
-  <!-- ── 6 · El método ─────────────────────────────────────────────── -->
+  <!-- ── 6 · El ciclo de Spec Kit ──────────────────────────────────── -->
+  <section class="section" id="ciclo-speckit" aria-labelledby="ciclo-h">
+    <div class="shell">
+      <div class="section-head reveal">
+        <span class="label">GitHub Spec Kit · el ciclo</span>
+        <h2 id="ciclo-h" class="display-md">Cinco comandos, cinco archivos, en ese orden.</h2>
+        <p class="body">Nadie escribió <code class="mono">spec.md</code> ni <code class="mono">tasks.md</code> a mano: salieron de correr estos cinco comandos, uno detrás del otro, con Claude Code como integración. Cada uno lee lo que dejó el anterior y produce un archivo — esa es la fuente de verdad. Ábrelo en VS Code y ahí está, literal, lo que el agente usó.</p>
+      </div>
+
+      <div class="cycle-wrap">
+        <table class="cycle-table">
+          <caption class="skip-visually">El ciclo de Spec Kit aplicado a este proyecto: comando, qué fija, y el archivo que produce</caption>
+          <thead>
+            <tr><th scope="col">Comando</th><th scope="col">Qué fija</th><th scope="col">Archivo — ábrelo en VS Code</th></tr>
+          </thead>
+          <tbody class="reveal-stagger">
+            <tr>
+              <td class="mono cmd">/speckit.constitution</td>
+              <td class="body-sm">Las reglas que no se negocian: test-first, la suite corre offline sin llaves ni red, ownership de archivos define el paralelismo.</td>
+              <td><span class="file-chip mono">.specify/memory/constitution.md</span></td>
+            </tr>
+            <tr>
+              <td class="mono cmd">/speckit.specify</td>
+              <td class="body-sm">Qué hace la app y por qué — sin una palabra de tecnología. Las 4 historias de usuario, priorizadas P1–P4.</td>
+              <td><span class="file-chip mono">specs/001-ai-media-generator/spec.md</span></td>
+            </tr>
+            <tr>
+              <td class="mono cmd">/speckit.plan</td>
+              <td class="body-sm">El stack exacto y los contratos entre fases — firmas de función, rutas HTTP — lo que deja a tres personas construir sin verse.</td>
+              <td><span class="file-chip mono">specs/001-ai-media-generator/plan.md</span></td>
+            </tr>
+            <tr>
+              <td class="mono cmd">/speckit.tasks</td>
+              <td class="body-sm">Los 39 tickets, repartidos en 5 fases. Cada fase declara qué archivos posee y cuáles nunca toca.</td>
+              <td><span class="file-chip mono">specs/001-ai-media-generator/tasks.md</span></td>
+            </tr>
+            <tr data-focal="true">
+              <td class="mono cmd">/speckit.implement fase N</td>
+              <td class="body-sm">El código real de esa fase, ticket por ticket — la prueba se escribe antes que el código que la pasa.</td>
+              <td><span class="file-chip mono">app/ · components/ · lib/</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="caption section-note">Los cinco comandos están declarados en <code class="mono">.specify/workflows/speckit/workflow.yml</code> con nombre de comando en punto — <code class="mono">speckit.specify</code>, no <code class="mono">speckit-specify</code>.</p>
+    </div>
+  </section>
+
+  <!-- ── 7 · El método ─────────────────────────────────────────────── -->
   <section class="section" id="metodo" aria-labelledby="metodo-h">
     <div class="shell">
       <div class="section-head reveal">
@@ -747,7 +812,43 @@ a { color: inherit; }
     </div>
   </section>
 
-  <!-- ── 7 · Por qué le importa a un líder TI ─────────────────────── -->
+  <!-- ── 8 · Por qué hay dos copias del repo ──────────────────────── -->
+  <section class="section" id="dos-copias" aria-labelledby="copias-h">
+    <div class="shell">
+      <div class="section-head reveal">
+        <span class="label">Antes de la presentación</span>
+        <h2 id="copias-h" class="display-md">Por qué hay dos copias del repositorio.</h2>
+        <p class="body">Un agente tarda entre 5 y 15 minutos por ticket — construir las cinco fases en vivo no cabe en una presentación de 10 minutos. La solución no es fingirlo: es separar qué se construye antes de la fecha de qué se construye en vivo, delante de la audiencia.</p>
+      </div>
+
+      <div class="copies-grid">
+        <div class="owns-card reveal" data-focal="true">
+          <header><h3>El repo real</h3><span class="branch mono">main</span></header>
+          <dl>
+            <dt>Tiene</dt>
+            <dd>Las cinco fases ya construidas, de antemano, y el <code class="mono">.env.local</code> con las llaves reales.</dd>
+            <dt style="margin-top:10px">Para qué</dt>
+            <dd>El <code class="mono">npm run dev</code> del cierre — la app funcionando de verdad, con cuentas reales.</dd>
+          </dl>
+        </div>
+        <div class="owns-card reveal">
+          <header><h3>demo-speckit</h3><span class="branch mono">carpeta aparte</span></header>
+          <dl>
+            <dt>Tiene</dt>
+            <dd>Solo hasta la fase 1, en el tag <code class="mono">fase-1</code>. Las fases 2, 3 y 4 todavía no existen ahí.</dd>
+            <dt style="margin-top:10px">Para qué</dt>
+            <dd>Lanzar <code class="mono">/speckit.implement fase 2·3·4</code> en vivo — el agente construye de verdad, en tiempo real, sin arriesgar el repo del cierre.</dd>
+          </dl>
+        </div>
+      </div>
+
+      <div class="callout reveal">
+        <p>Sin la segunda copia, <code class="mono">git checkout -b 001-frontend</code> en vivo falla con <code class="mono">fatal: a branch named '001-frontend' already exists</code> — esa rama ya se construyó de antemano en el repo real. El tag <code class="mono">pre-fase-1</code> — el repositorio sin código, solo las specs — es otra cosa: sirve para practicar antes, no para la demo en vivo.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 9 · Por qué le importa a un líder TI ─────────────────────── -->
   <section class="section" aria-labelledby="lider-h">
     <div class="shell">
       <div class="section-head reveal">
@@ -765,7 +866,7 @@ a { color: inherit; }
     </div>
   </section>
 
-  <!-- ── 8 · Cierre ─────────────────────────────────────────────────── -->
+  <!-- ── 10 · Cierre ────────────────────────────────────────────────── -->
   <section class="closing" aria-labelledby="cierre-h">
     <div class="shell">
       <h2 id="cierre-h" class="display-lg">La especificación es el código fuente.</h2>
