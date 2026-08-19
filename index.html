@@ -403,6 +403,7 @@ a { color: inherit; }
   .topbar .ghlink { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding-inline: 10px; text-decoration: none; font-size: 15px; font-weight: 500; color: var(--color-ink-subtle); transition: color 140ms ease; }
   .topbar .ghlink:hover { color: var(--color-ink); }
   .topbar .ghlink svg { width: 20px; height: 20px; }
+  .topbar .btn-qr { display: inline-flex; }
   .method-body { grid-template-columns: 1fr 1fr; align-items: start; gap: 48px; }
   .diagram-v { display: none; }
   .diagram-h { display: block; }
@@ -417,6 +418,64 @@ a { color: inherit; }
   .steps { grid-template-columns: repeat(3, 1fr); gap: 32px; }
   .step-shot { max-width: 240px; }
 }
+
+/* ── §6b · Código QR: botón de la topbar y su modal ───────────────────── */
+.btn-qr {
+  display: none; align-items: center; justify-content: center;
+  width: 44px; height: 44px; flex: none; padding: 0; margin-left: -4px;
+  border: 1px solid transparent; border-radius: 9999px;
+  background: transparent; color: var(--color-ink-subtle); cursor: pointer;
+  transition: color 140ms ease, border-color 140ms ease, background-color 140ms ease, transform 140ms ease;
+}
+.btn-qr:hover { color: var(--color-ink); border-color: var(--color-hairline-strong); background: var(--color-surface-2); }
+.btn-qr:active { transform: scale(0.94); }
+.btn-qr svg { width: 21px; height: 21px; }
+
+.qr-modal { border: 0; padding: 0; background: transparent; max-width: none; max-height: none; overflow: visible; }
+.qr-modal::backdrop { background: rgba(12, 10, 9, 0.55); opacity: 0; transition: opacity 200ms ease; }
+.qr-modal[data-open="true"]::backdrop { opacity: 1; }
+html:has(.qr-modal[open]) .topbar { backdrop-filter: none; }
+
+.qr-card {
+  width: min(384px, calc(100vw - 40px));
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-hairline-strong);
+  border-radius: 20px;
+  box-shadow: var(--shadow-lift);
+  padding: 28px 24px 24px;
+  text-align: center;
+  position: relative;
+  opacity: 0;
+  transform: translateY(10px) scale(0.94);
+  transition: opacity 220ms ease, transform 260ms cubic-bezier(0.2, 1.1, 0.3, 1);
+}
+.qr-modal[data-open="true"] .qr-card { opacity: 1; transform: translateY(0) scale(1); }
+
+.qr-card h2 { margin: 0 0 8px; padding-inline: 20px; }
+.qr-sub { color: var(--color-ink-subtle); margin: 0 auto; max-width: 30ch; }
+.qr-close {
+  position: absolute; top: 12px; right: 12px;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; padding: 0; border-radius: 9999px;
+  border: 1px solid transparent; background: transparent;
+  color: var(--color-ink-tertiary); cursor: pointer;
+  transition: color 140ms ease, background-color 140ms ease;
+}
+.qr-close:hover { color: var(--color-ink); background: var(--color-surface-3); }
+.qr-close svg { width: 17px; height: 17px; }
+
+/* El QR se mantiene cuadrado y con su zona de silencio: sin margen blanco
+   alrededor, muchas cámaras no lo enganchan. */
+.qr-frame {
+  width: min(248px, 62vw); aspect-ratio: 1; margin: 20px auto 16px;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-hairline);
+  border-radius: 14px;
+  padding: 10px;
+}
+.qr-svg { width: 100%; height: 100%; display: block; }
+.qr-url { font-size: 12px; color: var(--color-ink-subtle); text-decoration: none; border-bottom: 1px solid var(--color-hairline-strong); }
+.qr-url:hover { color: var(--color-ink); }
 
 /* ── §7 · Última regla de la hoja. Sin excepciones. ───────────────────── */
 @media (prefers-reduced-motion: reduce) {
@@ -455,6 +514,14 @@ a { color: inherit; }
       GitHub
     </a>
     <a class="btn btn-primary" href="https://ia-generator-openspec.vercel.app/">Probar la app</a>
+    <button type="button" class="btn-qr" data-qr-open aria-haspopup="dialog" aria-label="Ver el código QR para abrir la app en el celular">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <rect x="3" y="3" width="6" height="6" rx="1.5"/>
+        <rect x="15" y="3" width="6" height="6" rx="1.5"/>
+        <rect x="3" y="15" width="6" height="6" rx="1.5"/>
+        <path d="M15 15h2v2h-2zM19 15h2M15 19h2M19 19h2"/>
+      </svg>
+    </button>
   </div>
 </header>
 
@@ -808,6 +875,54 @@ a { color: inherit; }
   pipe.classList.add('is-live');
   document.getElementById('pipe-replay').addEventListener('click', run);
   if (!matchMedia('(prefers-reduced-motion: reduce)').matches) run();
+})();
+</script>
+<!-- Código QR de la app. <dialog> nativo: trae el fondo, el foco atrapado y
+     Escape para cerrar sin escribir nada de eso a mano. -->
+<dialog class="qr-modal" id="qr-modal" aria-labelledby="qr-title">
+  <div class="qr-card">
+    <button type="button" class="qr-close" data-qr-close aria-label="Cerrar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    <h2 id="qr-title" class="heading-xl">Escanéalo con tu celular</h2>
+    <p class="caption qr-sub">La app es una PWA: se abre en el navegador y funciona como una app, sin instalar nada.</p>
+    <!-- QR generado con la librería `qrcode` (npm) en tiempo de autoría, no en
+         el navegador: la URL es fija, así que no hace falta cargar un script
+         para redibujar lo mismo en cada visita. Para regenerarlo:
+         npx qrcode -t svg -e M -w 2 "https://ia-generator-openspec.vercel.app/" -->
+    <div class="qr-frame"><svg class="qr-svg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Código QR de ia-generator-openspec.vercel.app" viewBox="0 0 33 33" shape-rendering="crispEdges"><path fill="var(--color-surface-2)" d="M0 0h33v33H0z"/><path stroke="var(--color-ink)" d="M2 2.5h7m2 0h1m1 0h1m1 0h1m5 0h2m1 0h7M2 3.5h1m5 0h1m2 0h2m1 0h4m2 0h1m1 0h1m1 0h1m5 0h1M2 4.5h1m1 0h3m1 0h1m1 0h2m5 0h2m1 0h3m1 0h1m1 0h3m1 0h1M2 5.5h1m1 0h3m1 0h1m1 0h1m4 0h2m2 0h1m1 0h1m2 0h1m1 0h3m1 0h1M2 6.5h1m1 0h3m1 0h1m1 0h2m1 0h2m3 0h1m1 0h3m1 0h1m1 0h3m1 0h1M2 7.5h1m5 0h1m1 0h1m1 0h3m2 0h2m3 0h1m1 0h1m5 0h1M2 8.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M10 9.5h1m1 0h3m1 0h3m3 0h1M2 10.5h1m1 0h5m4 0h5m1 0h1m1 0h1m2 0h5M4 11.5h4m3 0h1m2 0h1m1 0h1m1 0h4m1 0h4m3 0h1M4 12.5h1m1 0h1m1 0h2m1 0h1m2 0h1m2 0h3m5 0h1M3 13.5h3m1 0h1m1 0h4m1 0h1m5 0h2m3 0h3m1 0h1M2 14.5h1m1 0h2m2 0h1m1 0h1m2 0h5m1 0h1m2 0h1m4 0h2M13 15.5h1m2 0h1m1 0h1m2 0h6m3 0h1M3 16.5h1m2 0h1m1 0h5m1 0h1m2 0h1m1 0h2m1 0h1m1 0h5M2 17.5h4m3 0h1m2 0h3m6 0h5m3 0h1M2 18.5h1m1 0h2m2 0h2m1 0h2m2 0h1m1 0h3m1 0h1m5 0h2M2 19.5h2m1 0h3m2 0h1m1 0h1m1 0h2m2 0h1m2 0h4m1 0h1m1 0h1m1 0h1M2 20.5h1m5 0h1m1 0h2m1 0h1m1 0h4m1 0h1m4 0h2m1 0h1M2 21.5h1m1 0h1m1 0h2m6 0h1m1 0h3m1 0h1m1 0h1m3 0h1m2 0h1M2 22.5h1m1 0h1m1 0h6m5 0h1m1 0h1m2 0h5m1 0h3M10 23.5h1m1 0h4m2 0h1m1 0h3m3 0h5M2 24.5h7m2 0h3m1 0h3m3 0h2m1 0h1m1 0h3M2 25.5h1m5 0h1m1 0h2m1 0h3m2 0h1m2 0h2m3 0h1M2 26.5h1m1 0h3m1 0h1m1 0h1m2 0h2m1 0h4m2 0h5m1 0h3M2 27.5h1m1 0h3m1 0h1m1 0h2m1 0h2m3 0h1m1 0h2m5 0h4M2 28.5h1m1 0h3m1 0h1m1 0h3m1 0h2m1 0h1m1 0h2m3 0h6M2 29.5h1m5 0h1m2 0h1m2 0h1m1 0h1m1 0h1m3 0h2m1 0h3m1 0h1M2 30.5h7m1 0h2m2 0h2m3 0h3m1 0h2m3 0h1"/></svg></div>
+    <a class="qr-url mono" href="https://ia-generator-openspec.vercel.app/">ia-generator-openspec.vercel.app</a>
+  </div>
+</dialog>
+
+<script>
+// El QR: <dialog> nativo hace el fondo, el foco atrapado y Escape. Aquí sólo
+// va la entrada y la salida animadas, y devolver el foco al botón al cerrar.
+(function () {
+  var modal = document.getElementById('qr-modal');
+  var opener = document.querySelector('[data-qr-open]');
+  if (!modal || !opener || typeof modal.showModal !== 'function') return;
+  // Con movimiento reducido la hoja anula toda transición, así que esperar a
+  // transitionend colgaría el cierre: el tiempo de salida pasa a cero.
+  var OUT = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 240;
+
+  function open() {
+    modal.showModal();
+    requestAnimationFrame(function () { modal.dataset.open = 'true'; });
+  }
+  function close() {
+    if (modal.dataset.open !== 'true') return;
+    modal.dataset.open = 'false';
+    setTimeout(function () { modal.close(); }, OUT);
+  }
+
+  opener.addEventListener('click', open);
+  modal.querySelector('[data-qr-close]').addEventListener('click', close);
+  // Clic fuera de la tarjeta: el <dialog> ocupa todo, así que el blanco es él.
+  modal.addEventListener('click', function (e) { if (e.target === modal) close(); });
+  // Escape lo cierra el navegador de golpe; lo interceptamos para animarlo.
+  modal.addEventListener('cancel', function (e) { e.preventDefault(); close(); });
+  modal.addEventListener('close', function () { modal.dataset.open = 'false'; opener.focus(); });
 })();
 </script>
 </body>
