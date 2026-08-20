@@ -81,7 +81,18 @@ copiar sin copiar la especificación entera.
   de navegador aquí para capturarla. No presentar como capturas reales.
 - Los números de la landing (39 tickets, 5 fases, 4 personas, 80 archivos de
   código, 0 escritos a mano) salen del repositorio.
-- No hay testimonios, clientes, precios ni benchmarks. No inventar ninguno.
+- No hay testimonios, clientes, precios ni benchmarks **del producto**. No
+  inventar ninguno.
+- Excepción declarada (2026-08-20, `/comparativa`): sí se citan **terceros que
+  hablan del método**, nunca del producto. Reglas: la cita es textual y
+  verificable, enlaza a la publicación original, la traducción va aparte del
+  original, y el encabezado deja explícito que esas personas no hablan de este
+  proyecto. Las tres publicaciones citadas se verificaron contra
+  `cdn.syndication.twimg.com/tweet-result`; los avatares están descargados en
+  `assets/voices/`, no enlazados en caliente.
+- `/comparativa` también cita investigación externa (Faros AI 2026, DORA 2025,
+  METR 2025) con una lista de fuentes numerada al final. Toda cifra tomada de
+  fuera lleva su marcador; toda cifra del repositorio va sin marcador.
 
 ## Product Principles
 

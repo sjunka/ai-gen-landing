@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Caso de negocio — Lo que costó, y lo que habría costado</title>
-<meta name="description" content="Caso de negocio sintético del AI Media Generator: costos de infraestructura e IA, y la comparativa de ROI, tiempo y costo entre Spec-Driven Development, el desarrollo tradicional y los prompts sueltos.">
+<meta name="description" content="Caso de negocio sintético del AI Media Generator: costos de infraestructura e IA, el riesgo medido de acelerar con IA, y la comparativa de ROI, tiempo y costo entre Spec-Driven Development, el desarrollo tradicional y los prompts sueltos.">
 <link rel="icon" href="../assets/icon-192.png" type="image/png">
 <meta name="theme-color" content="#f5f5f5">
 <link rel="canonical" href="https://sjunka.github.io/ai-gen-landing/comparativa/">
@@ -12,7 +12,7 @@
 <meta property="og:type" content="website">
 <meta property="og:locale" content="es_ES">
 <meta property="og:title" content="Caso de negocio — Lo que costó, y lo que habría costado">
-<meta property="og:description" content="Infraestructura en US$ 0 fijos al mes, y una app construida por ~US$ 2.035 que a la antigüita costaba US$ 12.000. Los supuestos, declarados uno por uno.">
+<meta property="og:description" content="Infraestructura en US$ 0 fijos al mes, y una app construida por ~US$ 2.035 que a la antigüita costaba US$ 12.000. Con el riesgo que mide la industria y los supuestos declarados uno por uno.">
 <meta property="og:url" content="https://sjunka.github.io/ai-gen-landing/comparativa/">
 <meta property="og:image" content="https://sjunka.github.io/ai-gen-landing/assets/og.jpg">
 <meta property="og:image:width" content="1200">
@@ -76,6 +76,7 @@
   --color-orb-peach: #f4c5a8;
   --color-orb-lavender: #c8b8e0;
   --color-orb-sky: #a8c8e8;
+  --color-orb-rose: #f0b9c4;
 
   --font-display: "Newsreader", "Newsreader Fallback", "Times New Roman", Georgia, serif;
   --font-sans: "Inter", "Inter Fallback", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -377,6 +378,78 @@ a { color: inherit; }
 .assumptions .label { color: var(--color-ink-tertiary); }
 .assumptions p { max-width: 68ch; }
 
+/* La columna de respuesta es la conclusión de la fila, no otro dato: se
+   escribe con la tinta plena para que el ojo caiga ahí al final. */
+.led-ans { font-size: 15px; color: var(--color-ink); }
+
+/* ── Voces de terceros ────────────────────────────────────────────────
+   La publicación se lee como una cita editorial, no como un widget
+   incrustado: el cuerpo va en el serif de la página y el @ en la mono de
+   los datos. El realce y el apagado de las hermanas son los mismos de las
+   filas de costos, así que la sección crece de aquí en vez de parecer
+   pegada desde otro sitio. */
+.voices { display: grid; gap: 16px; margin-top: 48px; --tint: var(--color-orb-mint); }
+.voice {
+  position: relative; display: flex; flex-direction: column;
+  padding: 24px 22px 20px;
+  border: 1px solid var(--color-hairline); border-radius: 18px;
+  background: var(--color-surface-2); text-decoration: none;
+  transition: border-color 200ms ease, box-shadow 200ms ease, opacity 200ms ease;
+}
+.voice::before {
+  content: ""; position: absolute; left: 0; top: 22px; bottom: 22px; width: 3px;
+  border-radius: 0 3px 3px 0; background: var(--tint);
+  opacity: 0; transition: opacity 200ms ease;
+}
+.voice:hover, .voice:focus-visible, .voice[data-hot="true"] {
+  border-color: color-mix(in srgb, var(--tint) 55%, var(--color-hairline-strong));
+  box-shadow: var(--shadow-lift); outline: none; z-index: 1;
+}
+.voice:hover::before, .voice:focus-visible::before, .voice[data-hot="true"]::before { opacity: 1; }
+.voices:hover .voice:not(:hover),
+.voices:focus-within .voice:not(:focus-visible):not(:hover) { opacity: 0.4; }
+
+.v-head { display: flex; align-items: center; gap: 12px; }
+.v-avatar { width: 44px; height: 44px; flex: none; border-radius: 50%; background: var(--color-surface-3); object-fit: cover; }
+.v-name { display: block; font-size: 15px; font-weight: 500; color: var(--color-ink); }
+.v-handle { display: block; font: 400 13px/1.4 var(--font-mono); color: var(--color-ink-subtle); }
+.v-role { display: block; margin-top: 14px; font-size: 12.5px; line-height: 1.4; color: var(--color-ink-subtle); }
+.v-text {
+  margin: 16px 0 0;
+  font-family: var(--font-display); font-size: 19px; font-weight: 300;
+  line-height: 1.45; letter-spacing: -0.008em; color: var(--color-ink);
+  text-wrap: pretty;
+}
+/* El original manda porque es lo verificable; la traducción va debajo, en
+   la voz pequeña, para que se lea sin sustituir a la cita. */
+.v-es { margin: 12px 0 20px; font-size: 13.5px; line-height: 1.5; color: var(--color-ink-subtle); text-wrap: pretty; }
+.v-foot {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  margin-top: auto; padding-top: 14px; border-top: 1px solid var(--color-hairline);
+  font-size: 13px; color: var(--color-ink-subtle);
+}
+.v-src { display: inline-flex; align-items: center; gap: 6px; color: var(--color-ink-subtle); transition: color 140ms ease; }
+.v-src svg { width: 12px; height: 12px; flex: none; }
+.voice:hover .v-src, .voice:focus-visible .v-src { color: var(--color-ink); }
+.voices-note { margin-top: 24px; color: var(--color-ink-subtle); max-width: 68ch; }
+
+/* ── Fuentes ─────────────────────────────────────────────────────────
+   Los números aquí sí son una secuencia: cada marcador del texto apunta a
+   una entrada. Es la única lista numerada de la página. */
+.refs { margin-top: 56px; padding-top: 28px; border-top: 1px solid var(--color-hairline); max-width: 76ch; }
+.refs h3 { font-size: 12px; font-weight: 600; line-height: 1.4; letter-spacing: 0.96px; text-transform: uppercase; color: var(--color-ink-tertiary); margin-bottom: 16px; }
+.refs ol { counter-reset: ref; }
+.refs li { counter-increment: ref; position: relative; padding-left: 28px; font-size: 14px; line-height: 1.5; color: var(--color-ink-subtle); }
+.refs li + li { margin-top: 12px; }
+.refs li::before { content: counter(ref); position: absolute; left: 0; top: 0; font: 400 12px/1.75 var(--font-mono); color: var(--color-ink-subtle); }
+.refs li:target { color: var(--color-ink-muted); }
+.refs cite { font-style: italic; }
+.refs a { color: var(--color-ink-muted); text-decoration: none; border-bottom: 1px solid var(--color-hairline-strong); transition: color 140ms ease, border-color 140ms ease; }
+.refs a:hover { color: var(--color-ink); border-bottom-color: var(--color-ink); }
+
+.ref-mark { display: inline-block; font: 400 11px/1 var(--font-mono); color: var(--color-ink-muted); text-decoration: none; vertical-align: super; transition: color 140ms ease; }
+.ref-mark:hover { color: var(--color-ink); }
+
 /* ── Cierre y pie ────────────────────────────────────────────────────── */
 .closing { position: relative; padding-block: var(--section); text-align: center; border-top: 1px solid var(--color-hairline); overflow: clip; }
 .closing::before {
@@ -417,13 +490,15 @@ a { color: inherit; }
   .led-head { display: grid; padding-bottom: 12px; border-bottom-color: var(--color-hairline-strong); border-radius: 0; }
   .led-head span { font-size: 12px; font-weight: 600; letter-spacing: 0.96px; text-transform: uppercase; color: var(--color-ink-tertiary); }
 
+  .voices { grid-template-columns: repeat(3, 1fr); }
+
   .methods {
     grid-template-columns: repeat(3, 1fr);
-    /* head · cifra · fórmula · barra · tiempo · tres atributos */
-    grid-template-rows: auto auto auto auto auto auto auto auto;
+    /* head · cifra · fórmula · barra · tiempo · cuatro atributos */
+    grid-template-rows: auto auto auto auto auto auto auto auto auto;
     align-items: stretch;
   }
-  .method { grid-row: span 8; grid-template-rows: subgrid; }
+  .method { grid-row: span 9; grid-template-rows: subgrid; }
   .method .m-attrs { display: contents; }
   .method .m-attr:first-of-type { margin-top: 22px; border-top: 1px solid var(--m-hair); }
   .method .m-attr:last-child { padding-bottom: 0; }
@@ -488,7 +563,7 @@ a { color: inherit; }
     <div class="shell">
       <span class="badge" data-hero-el>Caso de negocio · cifras sintéticas, supuestos declarados</span>
       <h1 class="display-xl" data-hero-el>Lo que costó. Y lo que habría costado.</h1>
-      <p class="body hero-sub" data-hero-el>La misma aplicación, estimada de tres maneras: a la antigüita, con prompts sueltos, y con Spec-Driven Development. Con la infraestructura, el gasto en IA y el ROI puestos sobre la mesa.</p>
+      <p class="body hero-sub" data-hero-el>La misma aplicación, estimada de tres maneras: a la antigüita, con prompts sueltos, y con Spec-Driven Development. Con la infraestructura, el gasto en IA, el ROI y el riesgo puestos sobre la mesa.</p>
     </div>
   </section>
 
@@ -630,6 +705,7 @@ a { color: inherit; }
         <symbol id="ico-yes" viewBox="0 0 20 20"><path d="M4.5 10.5 8 14l7.5-8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
         <symbol id="ico-no" viewBox="0 0 20 20"><path d="M5.5 5.5l9 9m0-9-9 9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
         <symbol id="ico-half" viewBox="0 0 20 20"><path d="M5 10h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+        <symbol id="ico-x" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="currentColor"/></symbol>
       </svg>
 
       <p class="caption methods-hint" data-methods-hint hidden>Haz clic en un método para destacarlo mientras hablas de él.</p>
@@ -658,6 +734,10 @@ a { color: inherit; }
             <svg class="m-ico" viewBox="0 0 20 20" aria-hidden="true"><use href="#ico-half"></use></svg>
             <div><span class="m-attr-k">Repetible</span><span class="m-attr-v">Solo si el equipo documenta al día. Casi nadie lo hace.</span></div>
           </div>
+          <div class="m-attr" data-state="half">
+            <svg class="m-ico" viewBox="0 0 20 20" aria-hidden="true"><use href="#ico-half"></use></svg>
+            <div><span class="m-attr-k">Cambiar de opinión</span><span class="m-attr-v">Se rehace el análisis, el diseño y el código. Se renegocia el cronograma.</span></div>
+          </div>
           </div>
         </article>
         <article class="method">
@@ -683,6 +763,10 @@ a { color: inherit; }
           <div class="m-attr" data-state="no">
             <svg class="m-ico" viewBox="0 0 20 20" aria-hidden="true"><use href="#ico-no"></use></svg>
             <div><span class="m-attr-k">Repetible</span><span class="m-attr-v">El criterio se queda en el historial del chat.</span></div>
+          </div>
+          <div class="m-attr" data-state="no">
+            <svg class="m-ico" viewBox="0 0 20 20" aria-hidden="true"><use href="#ico-no"></use></svg>
+            <div><span class="m-attr-k">Cambiar de opinión</span><span class="m-attr-v">Nadie sabe qué se asumió la primera vez. Se vuelve a empezar.</span></div>
           </div>
           </div>
         </article>
@@ -710,6 +794,10 @@ a { color: inherit; }
             <svg class="m-ico" viewBox="0 0 20 20" aria-hidden="true"><use href="#ico-yes"></use></svg>
             <div><span class="m-attr-k">Repetible</span><span class="m-attr-v">La especificación reconstruye la app con otro equipo u otro agente.</span></div>
           </div>
+          <div class="m-attr" data-state="yes">
+            <svg class="m-ico" viewBox="0 0 20 20" aria-hidden="true"><use href="#ico-yes"></use></svg>
+            <div><span class="m-attr-k">Cambiar de opinión</span><span class="m-attr-v">Se edita la especificación y se regenera solo lo que cambió.</span></div>
+          </div>
           </div>
         </article>
       </div>
@@ -724,7 +812,56 @@ a { color: inherit; }
     </div>
   </section>
 
-  <!-- ── 6 · Por qué no basta con prompts ───────────────────────────── -->
+  <!-- ── 6 · El riesgo que no aparece en la factura ─────────────────── -->
+  <section class="section" aria-labelledby="riesgo-h" style="padding-top:0">
+    <div class="shell">
+      <div class="section-head reveal">
+        <span class="label eyebrow">El riesgo</span>
+        <h2 id="riesgo-h" class="display-md">Ir seis veces más rápido es justo lo que asusta a un CTO.</h2>
+        <p class="body">Un número de ahorro sin un número de riesgo al lado no es un caso de negocio, es un folleto. La industria ya midió qué pasa cuando un equipo acelera con IA sin cambiar cómo trabaja: los resultados salieron mal, y son el mejor argumento que existe a favor de escribir la especificación primero.</p>
+      </div>
+
+      <div class="led" role="table" aria-label="Riesgos medidos de la IA en desarrollo y qué hace la especificación con cada uno" style="--led-cols: 210px minmax(0,1fr) minmax(0,1.05fr); --tint: var(--color-orb-rose)">
+        <div class="led-row led-head" role="row"><span role="columnheader">Lo que se midió</span><span role="columnheader">Qué encontró la industria</span><span role="columnheader">Qué hace la especificación</span></div>
+        <div class="led-row" role="row" tabindex="0">
+          <span class="led-k" role="rowheader">Incidentes en producción</span>
+          <span class="led-what" role="cell">Subieron 243&nbsp;% por cada PR fusionado en los equipos con adopción alta de IA. Dos años de telemetría sobre 22.000 desarrolladores.<a class="ref-mark" href="#ref-1" aria-label="Fuente 1">1</a></span>
+          <span class="led-ans" role="cell">La prueba va antes que el código, por constitución. 72 en verde antes de que existiera la primera pantalla.</span>
+        </div>
+        <div class="led-row" role="row" tabindex="0">
+          <span class="led-k" role="rowheader">Tiempo de revisión</span>
+          <span class="led-what" role="cell">La mediana se multiplicó por cinco. El cuello de botella se mudó del que escribe al que revisa.<a class="ref-mark" href="#ref-1" aria-label="Fuente 1">1</a></span>
+          <span class="led-ans" role="cell">El revisor compara el PR contra un criterio de aceptación escrito, no contra lo que recuerde de la reunión.</span>
+        </div>
+        <div class="led-row" role="row" tabindex="0">
+          <span class="led-k" role="rowheader">PR sin revisión humana</span>
+          <span class="led-what" role="cell">31&nbsp;% más PR fusionados sin que nadie los mirara. La velocidad se pagó saltándose el control.<a class="ref-mark" href="#ref-1" aria-label="Fuente 1">1</a></span>
+          <span class="led-ans" role="cell">Cada fase entra por PR contra <span class="mono">main</span>, con la revisión automática de GitHub Actions corriendo en cada push.</span>
+        </div>
+        <div class="led-row" role="row" tabindex="0">
+          <span class="led-k" role="rowheader">Estabilidad de la entrega</span>
+          <span class="led-what" role="cell">DORA 2025: la adopción de IA ya se relaciona positivamente con el rendimiento, pero sigue relacionándose <em>negativamente</em> con la estabilidad.<a class="ref-mark" href="#ref-2" aria-label="Fuente 2">2</a></span>
+          <span class="led-ans" role="cell">Cada fase declara de qué archivos es dueña y cuáles no toca. Tres ramas en paralelo, cero conflictos de merge.</span>
+        </div>
+        <div class="led-row" role="row" tabindex="0">
+          <span class="led-k" role="rowheader">La sensación de velocidad</span>
+          <span class="led-what" role="cell">Un ensayo aleatorizado midió 19&nbsp;% <em>más lentos</em> a desarrolladores que salieron convencidos de haber ido 20&nbsp;% más rápido.<a class="ref-mark" href="#ref-3" aria-label="Fuente 3">3</a></span>
+          <span class="led-ans" role="cell">Por eso lo que se cuenta aquí son tickets cerrados, pruebas en verde y archivos en el repositorio. La sensación no entra en la tabla.</span>
+        </div>
+        <div class="led-row" role="row" tabindex="0">
+          <span class="led-k" role="rowheader">Depender de un proveedor</span>
+          <span class="led-what" role="cell">El costo de las herramientas de IA por desarrollador se volvió una línea fija del presupuesto, y cambiar de agente significa reentrenar al equipo entero.</span>
+          <span class="led-ans" role="cell">El flujo vive en el repositorio como texto plano. La especificación no sabe qué agente la ejecuta, así que cambiarlo cuesta una tarde.</span>
+        </div>
+      </div>
+
+      <p class="body reveal" style="margin-top:32px; max-width:68ch;">El hallazgo central de DORA en 2025 es el que sostiene esta página entera: <strong style="font-weight:500;color:var(--color-ink)">la IA no arregla a un equipo, lo amplifica</strong>. El retorno no sale de la herramienta, sale del sistema que la rodea.<a class="ref-mark" href="#ref-2" aria-label="Fuente 2">2</a> La especificación es ese sistema, y es lo único de la lista de arriba que un equipo puede escribir en una tarde.</p>
+
+      <p class="gloss reveal">Ninguna de estas cifras es nuestra. Salen de tres estudios independientes de 2025 y 2026 — citados al final — y ninguno de los tres estudió este proyecto.</p>
+    </div>
+  </section>
+
+  <!-- ── 7 · Por qué no basta con prompts ───────────────────────────── -->
   <section class="section" aria-labelledby="rigor-h" style="padding-top:0">
     <div class="shell">
       <div class="section-head reveal">
@@ -749,7 +886,73 @@ a { color: inherit; }
     </div>
   </section>
 
-  <!-- ── 7 · Supuestos ──────────────────────────────────────────────── -->
+  <!-- ── 8 · Voces de terceros ──────────────────────────────────────── -->
+  <section class="section" aria-labelledby="voces-h" style="padding-top:0">
+    <div class="shell">
+      <div class="section-head reveal">
+        <span class="label eyebrow">Terceros</span>
+        <h2 id="voces-h" class="display-md">Ninguno de ellos habla de este proyecto.</h2>
+        <p class="body">Hablan del método, en público y por su cuenta: un ingeniero distinguido de AWS, el fundador de DeepLearning.AI y la consultora que publica el Technology Radar. Llegaron a la misma conclusión sin saber que existíamos.</p>
+      </div>
+
+      <div class="voices reveal-stagger">
+        <a class="voice" href="https://x.com/MarcJBrooker/status/2054680504734273780" target="_blank" rel="noopener noreferrer">
+          <span class="v-head">
+            <img class="v-avatar" src="../assets/voices/brooker.jpg" alt="" width="44" height="44" loading="lazy" decoding="async">
+            <span>
+              <span class="v-name">Marc Brooker</span>
+              <span class="v-handle">@MarcJBrooker</span>
+            </span>
+          </span>
+          <span class="v-role">VP y Distinguished Engineer en AWS. Dieciséis años ahí: EC2, EBS, Lambda y Aurora DSQL.</span>
+          <p class="v-text" lang="en">“I believe that spec-driven development, whether formal specs or conversations, is the future. But writing great specs is hard, and always has been.”</p>
+          <p class="v-es">Creo que el desarrollo guiado por especificación — formal o conversada — es el futuro. Pero escribir buenas especificaciones es difícil, y siempre lo ha sido.</p>
+          <span class="v-foot">
+            <time datetime="2026-05-13">13 de mayo de 2026</time>
+            <span class="v-src">Ver original <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#ico-x"></use></svg></span>
+          </span>
+        </a>
+
+        <a class="voice" href="https://x.com/AndrewYNg/status/2044449830605582629" target="_blank" rel="noopener noreferrer">
+          <span class="v-head">
+            <img class="v-avatar" src="../assets/voices/ng.jpg" alt="" width="44" height="44" loading="lazy" decoding="async">
+            <span>
+              <span class="v-name">Andrew Ng</span>
+              <span class="v-handle">@AndrewYNg</span>
+            </span>
+          </span>
+          <span class="v-role">Fundador de DeepLearning.AI y de Coursera. Profesor en Stanford.</span>
+          <p class="v-text" lang="en">“Vibe coding is fast, but often produces code that doesn’t match what you asked for. […] write a detailed spec defining what to build, and work with your coding agent to implement it. Many of the best developers already build this way.”</p>
+          <p class="v-es">Programar por intuición es rápido, pero suele producir código que no coincide con lo que pediste. […] escribe una especificación detallada de qué construir y trabaja con tu agente para implementarla. Muchos de los mejores desarrolladores ya construyen así.</p>
+          <span class="v-foot">
+            <time datetime="2026-04-15">15 de abril de 2026</time>
+            <span class="v-src">Ver original <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#ico-x"></use></svg></span>
+          </span>
+        </a>
+
+        <a class="voice" href="https://x.com/thoughtworks/status/1997924176833794396" target="_blank" rel="noopener noreferrer">
+          <span class="v-head">
+            <img class="v-avatar" src="../assets/voices/thoughtworks.jpg" alt="" width="44" height="44" loading="lazy" decoding="async">
+            <span>
+              <span class="v-name">Thoughtworks</span>
+              <span class="v-handle">@thoughtworks</span>
+            </span>
+          </span>
+          <span class="v-role">La consultora que publica el Technology Radar, la lista que muchos CTO usan para decidir qué adoptar.</span>
+          <p class="v-text" lang="en">“As AI-assisted coding takes off, traditional ‘vibe-coding’ won’t cut it. Enter Spec-Driven Development — a 2025 engineering practice that defines specs first, then uses them to generate reliable, maintainable code with AI agents.”</p>
+          <p class="v-es">Con el auge de la programación asistida por IA, programar por intuición ya no alcanza. Entra el Spec-Driven Development: definir la especificación primero y usarla para generar código confiable y mantenible con agentes.</p>
+          <span class="v-foot">
+            <time datetime="2025-12-08">8 de diciembre de 2025</time>
+            <span class="v-src">Ver original <svg viewBox="0 0 24 24" aria-hidden="true"><use href="#ico-x"></use></svg></span>
+          </span>
+        </a>
+      </div>
+
+      <p class="caption voices-note reveal">Publicaciones públicas de X, citadas en su idioma original con la traducción debajo. Los corchetes marcan dónde se omitió texto; cada tarjeta abre la publicación completa. Thoughtworks ubica esta práctica en el anillo <i>Assess</i> de su radar, no en <i>Adopt</i>: es algo que vale la pena probar, no todavía un estándar.</p>
+    </div>
+  </section>
+
+  <!-- ── 9 · Supuestos ──────────────────────────────────────────────── -->
   <section class="section" aria-labelledby="sup-h" style="padding-top:0">
     <div class="shell">
       <div class="section-head reveal">
@@ -777,11 +980,24 @@ a { color: inherit; }
           <span class="label">Lo que no es sintético</span>
           <p class="body-sm">39 tickets, 5 fases, 5 personas, 72 pruebas de la fase 1, 80 archivos de código, 0 escritos a mano. Eso se cuenta en el repositorio, no se estima.</p>
         </li>
+        <li>
+          <span class="label">Lo que las fuentes no dicen</span>
+          <p class="body-sm">Faros, DORA y METR midieron equipos que usan IA en general, no equipos que trabajan con especificación. Sus cifras establecen el riesgo, no lo resuelven: que la constitución de este proyecto responda a cada uno de esos riesgos es un argumento nuestro, no un hallazgo de esos estudios.</p>
+        </li>
       </ul>
+
+      <div class="refs reveal">
+        <h3>Fuentes</h3>
+        <ol>
+          <li id="ref-1">Faros AI, <cite>AI Engineering Report 2026: The Acceleration Whiplash</cite>. Dos años de telemetría sobre 22.000 desarrolladores en más de 4.000 equipos. <a href="https://www.faros.ai/research/ai-acceleration-whiplash" target="_blank" rel="noopener noreferrer">faros.ai/research/ai-acceleration-whiplash</a></li>
+          <li id="ref-2">DORA · Google Cloud, <cite>State of AI-assisted Software Development 2025</cite>. Cerca de 5.000 profesionales encuestados; 90&nbsp;% ya usa IA en su trabajo y 30&nbsp;% declara poca o ninguna confianza en el código que genera. <a href="https://dora.dev/dora-report-2025/" target="_blank" rel="noopener noreferrer">dora.dev/dora-report-2025</a></li>
+          <li id="ref-3">METR, <cite>Measuring the Impact of Early-2025 AI on Experienced Open-Source Developer Productivity</cite>, julio de 2025. Ensayo aleatorizado con 16 desarrolladores experimentados y 246 tareas reales. El propio METR advierte que el resultado no se extrapola a otros contextos y publicó una actualización en febrero de 2026. <a href="https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/" target="_blank" rel="noopener noreferrer">metr.org</a></li>
+        </ol>
+      </div>
     </div>
   </section>
 
-  <!-- ── 8 · Cierre ─────────────────────────────────────────────────── -->
+  <!-- ── 10 · Cierre ────────────────────────────────────────────────── -->
   <section class="closing" aria-labelledby="cierre-h">
     <div class="shell">
       <h2 id="cierre-h" class="display-md">El método es el ahorro. La app es la prueba.</h2>
@@ -917,7 +1133,7 @@ a { color: inherit; }
   // El color, la sombra y el apagado de las hermanas los hace CSS, así que
   // funcionan sin JS. Aquí sólo va el aumento, igual que el ciclo de /about.
   var noTouch = !matchMedia('(hover: none)').matches;
-  gsap.utils.toArray('.led-row:not(.led-head):not(.led-foot), .assumptions li').forEach(function (row) {
+  gsap.utils.toArray('.led-row:not(.led-head):not(.led-foot), .assumptions li, .voice').forEach(function (row) {
     row.setAttribute('tabindex', '0');
     var grow = gsap.timeline({ paused: true })
       .to(row, { scale: 1.02, duration: 0.42, ease: 'back.out(1.9)' }, 0);
