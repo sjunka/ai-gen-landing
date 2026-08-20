@@ -208,43 +208,65 @@ a { color: inherit; }
 
 .skip-visually { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
-/* ── Tablas editoriales: filetes, sin rejilla ────────────────────────── */
-.ledger { margin-top: 48px; width: 100%; border-collapse: collapse; }
-.ledger caption { text-align: left; }
-.ledger th, .ledger td { text-align: left; vertical-align: top; padding: 16px 24px 16px 0; border-bottom: 1px solid var(--color-hairline); }
-.ledger thead th { font-size: 12px; font-weight: 600; letter-spacing: 0.96px; text-transform: uppercase; color: var(--color-ink-tertiary); padding-block: 0 12px; }
-.ledger tbody th { font-weight: 500; color: var(--color-ink); }
-.ledger td:last-child, .ledger th:last-child { padding-right: 0; }
-.ledger .num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--color-ink); }
-.ledger tfoot th, .ledger tfoot td { border-bottom: 0; border-top: 1px solid var(--color-hairline-strong); font-weight: 500; color: var(--color-ink); }
-.ledger .detail { display: block; font-size: 14px; font-weight: 400; color: var(--color-ink-subtle); margin-top: 2px; max-width: 44ch; }
+/* ── Libros de costos: filas de rejilla que se pueden destacar ─────────
+   Igual que el ciclo de /about: una fila de <table> no acepta transform ni
+   sombra, y aquí cada fila tiene que poder crecer mientras se explica. Los
+   roles ARIA conservan la semántica de tabla. */
+.led { display: grid; gap: 2px; margin-top: 48px; }
+.led-row {
+  position: relative; display: grid; gap: 4px; padding: 14px 14px;
+  border: 1px solid transparent; border-bottom-color: var(--color-hairline);
+  border-radius: 12px;
+  transition: background-color 200ms ease, border-color 200ms ease, box-shadow 200ms ease, opacity 200ms ease;
+}
+.led-row::before {
+  content: ""; position: absolute; left: 4px; top: 12px; bottom: 12px; width: 3px;
+  border-radius: 3px; background: var(--tint); opacity: 0; transition: opacity 200ms ease;
+}
+.led-head { display: none; }
+.led-k { font-size: 15px; font-weight: 500; color: var(--color-ink); }
+.led-what { font-size: 15px; color: var(--color-ink-muted); }
+.led-plan { font-size: 14px; color: var(--color-ink-subtle); }
+.led-num { font-size: 14px; color: var(--color-ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.led .detail { display: block; font-size: 14px; color: var(--color-ink-subtle); margin-top: 2px; max-width: 44ch; }
+.led-foot { border-bottom: 0; border-top: 1px solid var(--color-hairline-strong); border-radius: 0; margin-top: 6px; padding-top: 18px; }
+.led-foot .led-k, .led-foot .led-num { font-weight: 500; color: var(--color-ink); }
+.led-foot::before { display: none; }
 
-/* La comparativa: la columna del método queda marcada, sin gritar. */
-.versus { table-layout: fixed; }
-.versus th[scope="col"].is-sdd, .versus td.is-sdd { background: var(--color-surface-2); }
-.versus thead th[scope="col"] { font-family: var(--font-sans); }
-.versus td { color: var(--color-ink-muted); font-size: 15px; }
-.versus td .num { display: block; margin-bottom: 2px; }
-.versus tbody th { width: 130px; }
-.versus td.is-sdd { box-shadow: inset 1px 0 0 var(--color-hairline), inset -1px 0 0 var(--color-hairline); }
-.versus thead th.is-sdd { box-shadow: inset 1px 0 0 var(--color-hairline), inset -1px 0 0 var(--color-hairline), inset 0 2px 0 var(--color-ink); }
+.led-row:not(.led-head):not(.led-foot) { cursor: default; }
+@media (hover: none) { .led-row, .assumptions li { cursor: pointer; } }
+.led-row:not(.led-head):not(.led-foot):hover,
+.led-row:not(.led-head):not(.led-foot):focus-visible,
+.led-row[data-hot="true"] {
+  background: var(--color-surface-2);
+  border-color: color-mix(in srgb, var(--tint) 55%, var(--color-hairline-strong));
+  box-shadow: var(--shadow-lift);
+  outline: none; z-index: 1;
+}
+.led-row:not(.led-head):not(.led-foot):hover::before,
+.led-row:not(.led-head):not(.led-foot):focus-visible::before,
+.led-row[data-hot="true"]::before { opacity: 1; }
+.led-row:not(.led-head):not(.led-foot):hover .led-what,
+.led-row:not(.led-head):not(.led-foot):focus-visible .led-what,
+.led-row[data-hot="true"] .led-what { color: var(--color-ink); }
+/* Sólo una fila se lee a la vez. */
+.led:hover .led-row:not(.led-head):not(.led-foot):not(:hover),
+.led:focus-within .led-row:not(.led-head):not(.led-foot):not(:focus-visible):not(:hover) { opacity: 0.4; }
 
-.versus-wrap { overflow-x: auto; margin-top: 48px; }
-.versus-wrap .ledger { margin-top: 0; min-width: 640px; }
-
-/* ── El veredicto: tres cifras grandes ───────────────────────────────── */
 /* ── Las tres maneras: una tarjeta por método ─────────────────────────
    Subgrid: las filas se declaran una vez en el contenedor y cada tarjeta
    las hereda, así "Pruebas" queda a la misma altura en las tres aunque el
    texto de cada una mida distinto. Sin eso, la comparación se lee torcida. */
 .section-head .eyebrow { display: block; color: var(--color-ink-tertiary); margin-bottom: 12px; }
 
+.methods-hint { color: var(--color-ink-tertiary); margin-top: 40px; }
+.methods-hint[hidden] { display: none; }
 .methods {
-  display: grid; gap: 16px; margin-top: 48px;
+  display: grid; gap: 16px; margin-top: 12px;
   grid-template-columns: 1fr;
 }
 .method {
-  display: grid; gap: 0;
+  display: grid; gap: 0; cursor: pointer;
   padding: 26px 24px 24px;
   border: 1px solid var(--color-hairline);
   border-radius: 18px;
@@ -291,11 +313,12 @@ a { color: inherit; }
   background-size: 0% 100%;
   color: var(--m-ink);
 }
+/* Sin JS la barra ya está dibujada en su valor; GSAP sólo la hace crecer. */
+.method .m-bar::before { background-size: var(--bar) 100%; }
 .m-bar-pct { font: 500 12px/1 var(--font-mono); color: var(--m-subtle); font-variant-numeric: tabular-nums; }
-@keyframes bar-grow { from { background-size: 0% 100%; } }
-.method:nth-child(1) .m-bar::before { background-size: 100% 100%; }
-.method:nth-child(2) .m-bar::before { background-size: 38% 100%; }
-.method:nth-child(3) .m-bar::before { background-size: 18% 100%; }
+.method:nth-child(1) { --bar: 100%; }
+.method:nth-child(2) { --bar: 38%; }
+.method:nth-child(3) { --bar: 18%; }
 
 .m-time { margin: 20px 0 0; font-size: 14px; color: var(--m-muted); }
 .m-time b { font-weight: 500; color: var(--m-ink); }
@@ -321,8 +344,26 @@ a { color: inherit; }
 .verdict .display-sm { font-size: clamp(38px, 3vw + 18px, 54px); font-variant-numeric: tabular-nums; letter-spacing: -0.03em; }
 
 /* ── Supuestos ───────────────────────────────────────────────────────── */
-.assumptions { margin-top: 48px; border-top: 1px solid var(--color-hairline); }
-.assumptions li { border-bottom: 1px solid var(--color-hairline); padding-block: 16px; display: grid; gap: 4px; }
+.assumptions { margin-top: 48px; --tint: var(--color-orb-lavender); }
+.assumptions li {
+  position: relative; display: grid; gap: 4px;
+  padding: 16px 14px; border-radius: 12px;
+  border: 1px solid transparent; border-bottom-color: var(--color-hairline);
+  transition: background-color 200ms ease, border-color 200ms ease, box-shadow 200ms ease, opacity 200ms ease;
+}
+.assumptions li::before {
+  content: ""; position: absolute; left: 4px; top: 12px; bottom: 12px; width: 3px;
+  border-radius: 3px; background: var(--tint); opacity: 0; transition: opacity 200ms ease;
+}
+.assumptions li:hover, .assumptions li:focus-visible, .assumptions li[data-hot="true"] {
+  background: var(--color-surface-2);
+  border-color: color-mix(in srgb, var(--tint) 55%, var(--color-hairline-strong));
+  box-shadow: var(--shadow-lift);
+  outline: none; z-index: 1;
+}
+.assumptions li:hover::before, .assumptions li:focus-visible::before, .assumptions li[data-hot="true"]::before { opacity: 1; }
+.assumptions:hover li:not(:hover),
+.assumptions:focus-within li:not(:focus-visible):not(:hover) { opacity: 0.4; }
 .assumptions .label { color: var(--color-ink-tertiary); }
 .assumptions p { max-width: 68ch; }
 
@@ -347,29 +388,6 @@ a { color: inherit; }
 .foot-team { font-size: 15px; line-height: 1.47; color: var(--color-ink-muted); }
 .foot-team li { min-height: 0; margin-top: 6px; }
 
-/* ── Motion: una sola entrada ────────────────────────────────────────── */
-@keyframes enter { from { opacity: 0; transform: translateY(14px); filter: blur(4px); } to { opacity: 1; transform: none; filter: none; } }
-
-@supports (animation-timeline: view()) {
-  .enter {
-    animation: enter 500ms cubic-bezier(0.16, 1, 0.3, 1) both;
-    animation-timeline: view();
-    animation-range: entry 0% entry 40%;
-  }
-  .enter:nth-child(2) { animation-delay: 60ms; }
-  .enter:nth-child(3) { animation-delay: 120ms; }
-
-  /* Las barras se llenan cuando las tarjetas entran, no al cargar la página:
-     el crecimiento es el argumento, y hay que verlo pasar. Sin timeline de
-     vista (o con movimiento reducido) quedan dibujadas en su valor final,
-     que es el que ya declara la regla estática de cada tarjeta. */
-  .m-bar::before {
-    animation: bar-grow 1ms linear both;
-    animation-timeline: view();
-    animation-range: entry 10% entry 55%;
-  }
-}
-
 /* ── Ensanchado: solo min-width ──────────────────────────────────────── */
 @media (max-width: 639px) {
   .hero-orbs span { opacity: 0.38; filter: blur(48px); }
@@ -385,6 +403,10 @@ a { color: inherit; }
 }
 
 @media (min-width: 900px) {
+  .led-row { grid-template-columns: var(--led-cols); gap: 20px; align-items: start; }
+  .led-head { display: grid; padding-bottom: 12px; border-bottom-color: var(--color-hairline-strong); border-radius: 0; }
+  .led-head span { font-size: 12px; font-weight: 600; letter-spacing: 0.96px; text-transform: uppercase; color: var(--color-ink-tertiary); }
+
   .methods {
     grid-template-columns: repeat(3, 1fr);
     /* head · cifra · fórmula · barra · tiempo · tres atributos */
@@ -454,9 +476,9 @@ a { color: inherit; }
   <section class="hero">
     <div class="hero-orbs" aria-hidden="true"><span></span><span></span></div>
     <div class="shell">
-      <span class="badge">Caso de negocio · cifras sintéticas, supuestos declarados</span>
-      <h1 class="display-xl">Lo que costó. Y lo que habría costado.</h1>
-      <p class="body hero-sub">La misma aplicación, estimada de tres maneras: a la antigüita, con prompts sueltos, y con Spec-Driven Development. Con la infraestructura, el gasto en IA y el ROI puestos sobre la mesa.</p>
+      <span class="badge" data-hero-el>Caso de negocio · cifras sintéticas, supuestos declarados</span>
+      <h1 class="display-xl" data-hero-el>Lo que costó. Y lo que habría costado.</h1>
+      <p class="body hero-sub" data-hero-el>La misma aplicación, estimada de tres maneras: a la antigüita, con prompts sueltos, y con Spec-Driven Development. Con la infraestructura, el gasto en IA y el ROI puestos sobre la mesa.</p>
     </div>
   </section>
 
@@ -477,75 +499,113 @@ a { color: inherit; }
   <!-- ── 3 · Costos de infraestructura ──────────────────────────────── -->
   <section class="section" aria-labelledby="infra-h">
     <div class="shell">
-      <div class="section-head enter">
+      <div class="section-head reveal">
         <h2 id="infra-h" class="display-md">La infraestructura cuesta cero fijo.</h2>
         <p class="body">Cada pieza corre en la capa gratuita de su proveedor. No es casualidad: el plan la eligió así desde la especificación, y el único gasto que queda — la generación de IA — la app lo controla sola.</p>
       </div>
 
-      <div class="versus-wrap enter">
-      <table class="ledger">
-        <caption class="skip-visually">Costo mensual de cada servicio de la aplicación</caption>
-        <thead>
-          <tr><th scope="col">Servicio</th><th scope="col">Qué hace</th><th scope="col">Plan</th><th scope="col">Costo / mes</th></tr>
-        </thead>
-        <tbody>
-          <tr><th scope="row">Vercel</th><td>Hosting, despliegue automático por push y CDN</td><td>Hobby</td><td class="num">US$ 0</td></tr>
-          <tr><th scope="row">MongoDB Atlas</th><td>Base de datos de generaciones y configuración</td><td>M0, 512 MB</td><td class="num">US$ 0</td></tr>
-          <tr><th scope="row">Clerk</th><td>Autenticación: Google y correo, roles del dueño</td><td>Free, 10.000 usuarios activos</td><td class="num">US$ 0</td></tr>
-          <tr><th scope="row">Vercel Blob</th><td>Almacenamiento de fotos, imágenes y videos</td><td>Incluido en Hobby</td><td class="num">US$ 0</td></tr>
-          <tr><th scope="row">GitHub + Actions</th><td>Repositorio, revisión automática en cada push</td><td>Free</td><td class="num">US$ 0</td></tr>
-          <tr><th scope="row">GitHub Pages</th><td>Esta página</td><td>Free</td><td class="num">US$ 0</td></tr>
-          <tr>
-            <th scope="row">Higgsfield</th>
-            <td>La IA que genera imagen y video<span class="detail">Único costo variable: se paga por generación, en créditos.</span></td>
-            <td>Créditos</td><td class="num">~US$ 0,12 / uso</td>
-          </tr>
-        </tbody>
-        <tfoot>
-          <tr><th scope="row" colspan="3">OPEX fijo mensual</th><td class="num">US$ 0</td></tr>
-        </tfoot>
-      </table>
+      <div class="led" role="table" aria-label="Costo mensual de cada servicio de la aplicación" style="--led-cols: 190px minmax(0,1fr) 210px 130px; --tint: var(--color-orb-sky)">
+        <div class="led-row led-head" role="row"><span role="columnheader">Servicio</span><span role="columnheader">Qué hace</span><span role="columnheader">Plan</span><span role="columnheader">Costo / mes</span></div>
+        <div class="led-row" role="row" tabindex="0">
+          <span class="led-k" role="rowheader">Vercel</span>
+          <span class="led-what" role="cell">Hosting, despliegue automático por push y CDN</span>
+          <span class="led-plan" role="cell">Hobby</span>
+          <span class="led-num mono" role="cell">US$ 0</span>
+        </div>
+        <div class="led-row" role="row" tabindex="0">
+          <span class="led-k" role="rowheader">MongoDB Atlas</span>
+          <span class="led-what" role="cell">Base de datos de generaciones y configuración</span>
+          <span class="led-plan" role="cell">M0, 512 MB</span>
+          <span class="led-num mono" role="cell">US$ 0</span>
+        </div>
+        <div class="led-row" role="row" tabindex="0">
+          <span class="led-k" role="rowheader">Clerk</span>
+          <span class="led-what" role="cell">Autenticación: Google y correo, roles del dueño</span>
+          <span class="led-plan" role="cell">Free, 10.000 usuarios activos</span>
+          <span class="led-num mono" role="cell">US$ 0</span>
+        </div>
+        <div class="led-row" role="row" tabindex="0">
+          <span class="led-k" role="rowheader">Vercel Blob</span>
+          <span class="led-what" role="cell">Almacenamiento de fotos, imágenes y videos</span>
+          <span class="led-plan" role="cell">Incluido en Hobby</span>
+          <span class="led-num mono" role="cell">US$ 0</span>
+        </div>
+        <div class="led-row" role="row" tabindex="0">
+          <span class="led-k" role="rowheader">GitHub + Actions</span>
+          <span class="led-what" role="cell">Repositorio, revisión automática en cada push</span>
+          <span class="led-plan" role="cell">Free</span>
+          <span class="led-num mono" role="cell">US$ 0</span>
+        </div>
+        <div class="led-row" role="row" tabindex="0">
+          <span class="led-k" role="rowheader">GitHub Pages</span>
+          <span class="led-what" role="cell">Esta página</span>
+          <span class="led-plan" role="cell">Free</span>
+          <span class="led-num mono" role="cell">US$ 0</span>
+        </div>
+        <div class="led-row" role="row" tabindex="0">
+          <span class="led-k" role="rowheader">Higgsfield</span>
+          <span class="led-what" role="cell">La IA que genera imagen y video<span class="detail">Único costo variable: se paga por generación, en créditos.</span></span>
+          <span class="led-plan" role="cell">Créditos</span>
+          <span class="led-num mono" role="cell">~US$ 0,12 / uso</span>
+        </div>
+        <div class="led-row led-foot" role="row"><span class="led-k" role="rowheader">OPEX fijo mensual</span><span role="cell"></span><span role="cell"></span><span class="led-num mono" role="cell">US$ 0</span></div>
       </div>
 
-      <p class="body enter" style="margin-top:32px; max-width:68ch;">El gasto variable no queda a la deriva: el dashboard del dueño — las historias de usuario T026 a T029 — trae contadores de uso, costo estimado por generación, selector de calidad y un interruptor que apaga la generación entera. El control del OPEX no es una hoja de cálculo aparte: <strong style="font-weight:500;color:var(--color-ink)">es una pantalla de la aplicación</strong>.</p>
+      <p class="body reveal" style="margin-top:32px; max-width:68ch;">El gasto variable no queda a la deriva: el dashboard del dueño — las historias de usuario T026 a T029 — trae contadores de uso, costo estimado por generación, selector de calidad y un interruptor que apaga la generación entera. El control del OPEX no es una hoja de cálculo aparte: <strong style="font-weight:500;color:var(--color-ink)">es una pantalla de la aplicación</strong>.</p>
     </div>
   </section>
 
   <!-- ── 4 · Costos de IA para construir ────────────────────────────── -->
   <section class="section" aria-labelledby="ia-h" style="padding-top:0">
     <div class="shell">
-      <div class="section-head enter">
+      <div class="section-head reveal">
         <h2 id="ia-h" class="display-md">La IA que construye también entra al presupuesto.</h2>
         <p class="body">El agente que escribe el código cobra por tokens. Es el costo nuevo que el desarrollo tradicional no tiene — y aun sumándolo, la cuenta no se le acerca.</p>
       </div>
 
-      <div class="versus-wrap enter">
-      <table class="ledger">
-        <caption class="skip-visually">Costo de agente por fase del proyecto</caption>
-        <thead>
-          <tr><th scope="col">Fase</th><th scope="col">Qué construye</th><th scope="col">Tokens (est.)</th><th scope="col">Costo (est.)</th></tr>
-        </thead>
-        <tbody>
-          <tr><th scope="row">Fase 1 · La base</th><td>Proyecto, diseño, mocks, CI — 9 tickets, 72 pruebas</td><td class="num">~4 M</td><td class="num">~US$ 9</td></tr>
-          <tr><th scope="row">Fase 2 · Pantallas</th><td>Las 6 pantallas del flujo — 8 tickets</td><td class="num">~3,5 M</td><td class="num">~US$ 8</td></tr>
-          <tr><th scope="row">Fase 3 · Backend</th><td>Base de datos, blobs, 4 rutas de API — 8 tickets</td><td class="num">~3,5 M</td><td class="num">~US$ 8</td></tr>
-          <tr><th scope="row">Fase 4 · Dashboard</th><td>Configuración, costos, pantalla del dueño — 5 tickets</td><td class="num">~2 M</td><td class="num">~US$ 5</td></tr>
-          <tr><th scope="row">Fase 5 · Integración</th><td>Merge, reconciliación, humo, deploy — 9 tickets</td><td class="num">~2 M</td><td class="num">~US$ 5</td></tr>
-        </tbody>
-        <tfoot>
-          <tr><th scope="row" colspan="3">Total de IA para construir la app</th><td class="num">~US$ 35</td></tr>
-        </tfoot>
-      </table>
+      <div class="led" role="table" aria-label="Costo de agente por fase del proyecto" style="--led-cols: 210px minmax(0,1fr) 120px 120px; --tint: var(--color-orb-peach)">
+        <div class="led-row led-head" role="row"><span role="columnheader">Fase</span><span role="columnheader">Qué construye</span><span role="columnheader">Tokens (est.)</span><span role="columnheader">Costo (est.)</span></div>
+        <div class="led-row" role="row" tabindex="0">
+          <span class="led-k" role="rowheader">Fase 1 · La base</span>
+          <span class="led-what" role="cell">Proyecto, diseño, mocks, CI — 9 tickets, 72 pruebas</span>
+          <span class="led-plan" role="cell">~4 M</span>
+          <span class="led-num mono" role="cell">~US$ 9</span>
+        </div>
+        <div class="led-row" role="row" tabindex="0">
+          <span class="led-k" role="rowheader">Fase 2 · Pantallas</span>
+          <span class="led-what" role="cell">Las 6 pantallas del flujo — 8 tickets</span>
+          <span class="led-plan" role="cell">~3,5 M</span>
+          <span class="led-num mono" role="cell">~US$ 8</span>
+        </div>
+        <div class="led-row" role="row" tabindex="0">
+          <span class="led-k" role="rowheader">Fase 3 · Backend</span>
+          <span class="led-what" role="cell">Base de datos, blobs, 4 rutas de API — 8 tickets</span>
+          <span class="led-plan" role="cell">~3,5 M</span>
+          <span class="led-num mono" role="cell">~US$ 8</span>
+        </div>
+        <div class="led-row" role="row" tabindex="0">
+          <span class="led-k" role="rowheader">Fase 4 · Dashboard</span>
+          <span class="led-what" role="cell">Configuración, costos, pantalla del dueño — 5 tickets</span>
+          <span class="led-plan" role="cell">~2 M</span>
+          <span class="led-num mono" role="cell">~US$ 5</span>
+        </div>
+        <div class="led-row" role="row" tabindex="0">
+          <span class="led-k" role="rowheader">Fase 5 · Integración</span>
+          <span class="led-what" role="cell">Merge, reconciliación, humo, deploy — 9 tickets</span>
+          <span class="led-plan" role="cell">~2 M</span>
+          <span class="led-num mono" role="cell">~US$ 5</span>
+        </div>
+        <div class="led-row led-foot" role="row"><span class="led-k" role="rowheader">Total de IA para construir la app</span><span role="cell"></span><span role="cell"></span><span class="led-num mono" role="cell">~US$ 35</span></div>
       </div>
 
-      <p class="body enter" style="margin-top:32px; max-width:68ch;">Y puede bajar a cero: el flujo de Spec Kit vive en el repositorio como texto plano, así que corre igual con <span class="link-inline">GitHub Copilot</span> — gratis con el GitHub Student Developer Pack — o con cualquier agente que el estudiante ya tenga. La especificación no sabe qué agente la ejecuta.</p>
+      <p class="body reveal" style="margin-top:32px; max-width:68ch;">Y puede bajar a cero: el flujo de Spec Kit vive en el repositorio como texto plano, así que corre igual con <span class="link-inline">GitHub Copilot</span> — gratis con el GitHub Student Developer Pack — o con cualquier agente que el estudiante ya tenga. La especificación no sabe qué agente la ejecuta.</p>
     </div>
   </section>
 
   <!-- ── 5 · La comparativa ─────────────────────────────────────────── -->
   <section class="section versus-section" aria-labelledby="versus-h" style="padding-top:0">
     <div class="shell">
-      <div class="section-head enter">
+      <div class="section-head reveal">
         <span class="label eyebrow">La comparación</span>
         <h2 id="versus-h" class="display-md">Tres maneras de construir la misma app.</h2>
         <p class="body">Mismo alcance y mismo equipo en los tres casos: 39 tickets, cinco personas, una tarifa de US$ 15 la hora. Lo único que cambia es cómo se organiza el trabajo. Esto es lo que cuesta cada camino.</p>
@@ -559,13 +619,14 @@ a { color: inherit; }
         <symbol id="ico-half" viewBox="0 0 20 20"><path d="M5 10h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
       </svg>
 
-      <div class="methods enter">
+      <p class="caption methods-hint" data-methods-hint hidden>Haz clic en un método para destacarlo mientras hablas de él.</p>
+      <div class="methods reveal-stagger">
         <article class="method">
           <header class="m-head">
             <h3 class="m-name">A la antigüita</h3>
             <span class="m-badge is-ghost" aria-hidden="true">·</span>
           </header>
-          <p class="m-capex display-sm">US$ 3.600</p>
+          <p class="m-capex display-sm" data-count="3600" data-prefix="US$ ">US$ 3.600</p>
           <p class="m-formula">240 horas × US$ 15</p>
           <div class="m-bar" role="img" aria-label="100 % del presupuesto">
             <span class="m-bar-pct">100 %</span>
@@ -591,7 +652,7 @@ a { color: inherit; }
             <h3 class="m-name">Prompts sueltos</h3>
             <span class="m-badge is-ghost" aria-hidden="true">·</span>
           </header>
-          <p class="m-capex display-sm">US$ 1.365</p>
+          <p class="m-capex display-sm" data-count="1365" data-prefix="US$ ">US$ 1.365</p>
           <p class="m-formula">90 horas × US$ 15 + US$ 15 de tokens</p>
           <div class="m-bar" role="img" aria-label="38 % del presupuesto">
             <span class="m-bar-pct">38 %</span>
@@ -617,7 +678,7 @@ a { color: inherit; }
             <h3 class="m-name">Spec-Driven Development</h3>
             <span class="m-badge">El método de este proyecto</span>
           </header>
-          <p class="m-capex display-sm">US$ 635</p>
+          <p class="m-capex display-sm" data-count="635" data-prefix="US$ ">US$ 635</p>
           <p class="m-formula">40 horas × US$ 15 + US$ 35 de tokens</p>
           <div class="m-bar" role="img" aria-label="18 % del presupuesto">
             <span class="m-bar-pct">18 %</span>
@@ -640,12 +701,12 @@ a { color: inherit; }
         </article>
       </div>
 
-      <p class="caption methods-note enter">En los tres casos la operación cuesta lo mismo: <b>US$ 0 al mes</b>, porque la infraestructura no cambia. Lo que cambia es lo que cuesta llegar hasta ahí.</p>
+      <p class="caption methods-note reveal">En los tres casos la operación cuesta lo mismo: <b>US$ 0 al mes</b>, porque la infraestructura no cambia. Lo que cambia es lo que cuesta llegar hasta ahí.</p>
 
       <dl class="verdict">
-        <div class="enter"><dd class="display-sm">−82 %</dd><dt>menos costo de construcción que a la antigüita: US$ 635 en lugar de US$ 3.600.</dt></div>
-        <div class="enter"><dd class="display-sm">4,7 : 1</dd><dt>de retorno: cada dólar invertido en el método ahorra US$ 4,70 del presupuesto tradicional.</dt></div>
-        <div class="enter"><dd class="display-sm">−90 %</dd><dt>menos tiempo hasta producción: de seis semanas a cuatro días.</dt></div>
+        <div class="reveal"><dd class="display-sm">−82 %</dd><dt>menos costo de construcción que a la antigüita: US$ 635 en lugar de US$ 3.600.</dt></div>
+        <div class="reveal"><dd class="display-sm">4,7 : 1</dd><dt>de retorno: cada dólar invertido en el método ahorra US$ 4,70 del presupuesto tradicional.</dt></div>
+        <div class="reveal"><dd class="display-sm">−90 %</dd><dt>menos tiempo hasta producción: de seis semanas a cuatro días.</dt></div>
       </dl>
     </div>
   </section>
@@ -653,12 +714,12 @@ a { color: inherit; }
   <!-- ── 6 · Por qué no basta con prompts ───────────────────────────── -->
   <section class="section" aria-labelledby="rigor-h" style="padding-top:0">
     <div class="shell">
-      <div class="section-head enter">
+      <div class="section-head reveal">
         <span class="label eyebrow">La prueba</span>
         <h2 id="rigor-h" class="display-md">Las tres filas de arriba no son promesas.</h2>
         <p class="body">Pedirle código a un chat también sale barato. La diferencia no está en la velocidad del primer día, sino en lo que queda cuando ese día se acaba. Pruebas, trabajo en paralelo y repetibilidad son las tres filas que separan a los métodos, y las tres se pueden contar en el repositorio.</p>
       </div>
-      <ul class="assumptions enter" style="margin-top:40px">
+      <ul class="assumptions reveal-stagger" style="margin-top:40px">
         <li>
           <span class="label">Pruebas · 72 en verde antes de la primera pantalla</span>
           <p class="body-sm">La constitución del proyecto exige la prueba antes que el código. Un chat sin especificación entrega la feature; nadie le pidió la prueba, así que no existe.</p>
@@ -678,11 +739,11 @@ a { color: inherit; }
   <!-- ── 7 · Supuestos ──────────────────────────────────────────────── -->
   <section class="section" aria-labelledby="sup-h" style="padding-top:0">
     <div class="shell">
-      <div class="section-head enter">
+      <div class="section-head reveal">
         <h2 id="sup-h" class="display-md">Los supuestos, uno por uno.</h2>
         <p class="body">Un caso sintético vale lo que valga la honestidad de sus supuestos. Estos son todos:</p>
       </div>
-      <ul class="assumptions enter" style="margin-top:40px">
+      <ul class="assumptions reveal-stagger" style="margin-top:40px">
         <li>
           <span class="label">Tarifa · US$ 15 / hora</span>
           <p class="body-sm">Tarifa de referencia de un desarrollador junior en Latinoamérica. Con tarifas más altas, la brecha entre métodos crece — las horas ahorradas valen más.</p>
@@ -750,5 +811,121 @@ a { color: inherit; }
     </section>
   </div>
 </footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+// Mismo lenguaje de movimiento que /about: el contenido ya está completo y
+// legible sin JS. Si el usuario pide menos movimiento, no se añade ninguno.
+(function () {
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce || typeof gsap === 'undefined') return;
+  document.documentElement.classList.add('js');
+  gsap.registerPlugin(ScrollTrigger);
+
+  // ── 1 · Héroe: entra al cargar, una sola vez ─────────────────────────
+  gsap.timeline({ defaults: { ease: 'power3.out' } })
+    .from('[data-hero-el]', { opacity: 0, y: 18, duration: 0.6, stagger: 0.1 });
+
+  // ── 2 · Revelado genérico de secciones y grupos ──────────────────────
+  gsap.utils.toArray('.reveal').forEach(function (el) {
+    gsap.fromTo(el, { opacity: 0, y: 20 }, {
+      opacity: 1, y: 0, duration: 0.6, ease: 'power3.out',
+      scrollTrigger: { trigger: el, start: 'top 85%', once: true }
+    });
+  });
+  gsap.utils.toArray('.reveal-stagger').forEach(function (group) {
+    gsap.fromTo(group.children, { opacity: 0, y: 16 }, {
+      opacity: 1, y: 0, duration: 0.5, ease: 'power3.out', stagger: 0.06,
+      scrollTrigger: { trigger: group, start: 'top 88%', once: true }
+    });
+  });
+
+  // ── 3 · Las cifras cuentan y su barra crece en el mismo compás ───────
+  //
+  // El número dice cuánto y la barra deja verlo: si llegaran en momentos
+  // distintos, serían dos datos en vez de uno.
+  var nf = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 });
+  gsap.utils.toArray('[data-count]').forEach(function (el) {
+    var end = +el.dataset.count;
+    var prefix = el.dataset.prefix || '';
+    var card = el.closest('.method');
+    var bar = card && card.querySelector('.m-bar');
+    var target = bar ? getComputedStyle(card).getPropertyValue('--bar').trim() : null;
+    if (bar) bar.style.setProperty('--bar', '0%');
+    ScrollTrigger.create({
+      trigger: card || el, start: 'top 82%', once: true,
+      onEnter: function () {
+        var obj = { v: 0 };
+        gsap.to(obj, {
+          v: end, duration: 1.1, ease: 'power2.out',
+          onUpdate: function () { el.textContent = prefix + nf.format(Math.round(obj.v)); }
+        });
+        if (bar && target) {
+          gsap.to(bar, { '--bar': target, duration: 1.1, ease: 'power2.out' });
+        }
+      }
+    });
+  });
+
+  // ── 4 · Métodos: clic para destacar el que se está explicando ────────
+  //
+  // Misma herramienta de presentación que las fases de /about: uno a la vez,
+  // el resto baja de intensidad, volver a hacer clic lo suelta.
+  var methodsHint = document.querySelector('[data-methods-hint]');
+  if (methodsHint) methodsHint.hidden = false;
+  var methods = gsap.utils.toArray('.method');
+  methods.forEach(function (card) {
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    card.setAttribute('aria-pressed', 'false');
+
+    function pick() {
+      var wasOn = card.dataset.on === 'true';
+      methods.forEach(function (c) { c.dataset.on = 'false'; c.setAttribute('aria-pressed', 'false'); });
+      if (!wasOn) { card.dataset.on = 'true'; card.setAttribute('aria-pressed', 'true'); }
+      var live = wasOn ? null : card;
+      methods.forEach(function (c) {
+        gsap.to(c, {
+          opacity: (!live || c === live) ? 1 : 0.4,
+          scale: c === live ? 1.02 : 1,
+          duration: 0.4, ease: c === live ? 'back.out(2)' : 'power2.out'
+        });
+      });
+    }
+
+    card.addEventListener('click', pick);
+    card.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); }
+    });
+  });
+
+  // ── 5 · Filas de costos: la fila enfocada crece para leerse ──────────
+  //
+  // El color, la sombra y el apagado de las hermanas los hace CSS, así que
+  // funcionan sin JS. Aquí sólo va el aumento, igual que el ciclo de /about.
+  var noTouch = !matchMedia('(hover: none)').matches;
+  gsap.utils.toArray('.led-row:not(.led-head):not(.led-foot), .assumptions li').forEach(function (row) {
+    row.setAttribute('tabindex', '0');
+    var grow = gsap.timeline({ paused: true })
+      .to(row, { scale: 1.02, duration: 0.42, ease: 'back.out(1.9)' }, 0);
+
+    var big = false;
+    function up() { if (big) return; big = true; row.dataset.hot = 'true'; grow.play(); }
+    function down() { if (!big) return; big = false; row.dataset.hot = 'false'; grow.reverse(); }
+
+    if (noTouch) {
+      row.addEventListener('mouseenter', up);
+      row.addEventListener('mouseleave', down);
+      row.addEventListener('focusin', up);
+      row.addEventListener('focusout', down);
+    } else {
+      // Un tap dispara también mouseenter y focusin: sólo el clic alterna.
+      row.addEventListener('click', function () { big ? down() : up(); });
+    }
+  });
+
+  ScrollTrigger.refresh();
+})();
+</script>
 </body>
 </html>
