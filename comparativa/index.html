@@ -12,7 +12,7 @@
 <meta property="og:type" content="website">
 <meta property="og:locale" content="es_ES">
 <meta property="og:title" content="Caso de negocio — Lo que costó, y lo que habría costado">
-<meta property="og:description" content="Infraestructura en US$ 0 fijos al mes, y una app construida por ~US$ 635 que a la antigüita costaba US$ 3.600. Los supuestos, declarados uno por uno.">
+<meta property="og:description" content="Infraestructura en US$ 0 fijos al mes, y una app construida por ~US$ 2.035 que a la antigüita costaba US$ 12.000. Los supuestos, declarados uno por uno.">
 <meta property="og:url" content="https://sjunka.github.io/ai-gen-landing/comparativa/">
 <meta property="og:image" content="https://sjunka.github.io/ai-gen-landing/assets/og.jpg">
 <meta property="og:image:width" content="1200">
@@ -315,10 +315,20 @@ a { color: inherit; }
 }
 /* Sin JS la barra ya está dibujada en su valor; GSAP sólo la hace crecer. */
 .method .m-bar::before { background-size: var(--bar) 100%; }
+
+/* Glosario al margen: el serif en cursiva marca que es una nota aparte, no
+   otro párrafo del argumento. */
+.opex-gloss {
+  margin-top: 16px; max-width: 62ch;
+  font-family: var(--font-display); font-style: italic;
+  font-size: 19px; font-weight: 300; line-height: 1.45; letter-spacing: -0.01em;
+  color: var(--color-ink-subtle);
+  border-left: 2px solid var(--color-hairline-strong); padding-left: 18px;
+}
 .m-bar-pct { font: 500 12px/1 var(--font-mono); color: var(--m-subtle); font-variant-numeric: tabular-nums; }
 .method:nth-child(1) { --bar: 100%; }
 .method:nth-child(2) { --bar: 38%; }
-.method:nth-child(3) { --bar: 18%; }
+.method:nth-child(3) { --bar: 17%; }
 
 .m-time { margin: 20px 0 0; font-size: 14px; color: var(--m-muted); }
 .m-time b { font-weight: 500; color: var(--m-ink); }
@@ -489,7 +499,7 @@ a { color: inherit; }
       <dl class="stats-grid">
         <div><dt class="display-md mono">US$ 0</dt><dd class="caption">de infraestructura fija al mes</dd></div>
         <div><dt class="display-md mono">~US$ 35</dt><dd class="caption">de IA para construir las 5 fases</dd></div>
-        <div><dt class="display-md mono">5,7×</dt><dd class="caption">menos costo que a la antigüita</dd></div>
+        <div><dt class="display-md mono">5,9×</dt><dd class="caption">menos costo que a la antigüita</dd></div>
         <div><dt class="display-md mono">6 sem → 4 días</dt><dd class="caption">de tiempo hasta producción</dd></div>
       </dl>
       <p class="caption stats-foot">Caso sintético: las tarifas y las horas son estimaciones declaradas abajo. Los conteos de tickets, pruebas y archivos son del repositorio.</p>
@@ -552,6 +562,8 @@ a { color: inherit; }
       </div>
 
       <p class="body reveal" style="margin-top:32px; max-width:68ch;">El gasto variable no queda a la deriva: el dashboard del dueño — las historias de usuario T026 a T029 — trae contadores de uso, costo estimado por generación, selector de calidad y un interruptor que apaga la generación entera. El control del OPEX no es una hoja de cálculo aparte: <strong style="font-weight:500;color:var(--color-ink)">es una pantalla de la aplicación</strong>.</p>
+
+      <p class="opex-gloss reveal">OPEX es lo que cuesta mantener la aplicación encendida mes a mes — servidores, base de datos, generaciones de IA — no lo que costó construirla.</p>
     </div>
   </section>
 
@@ -608,7 +620,7 @@ a { color: inherit; }
       <div class="section-head reveal">
         <span class="label eyebrow">La comparación</span>
         <h2 id="versus-h" class="display-md">Tres maneras de construir la misma app.</h2>
-        <p class="body">Mismo alcance y mismo equipo en los tres casos: 39 tickets, cinco personas, una tarifa de US$ 15 la hora. Lo único que cambia es cómo se organiza el trabajo. Esto es lo que cuesta cada camino.</p>
+        <p class="body">Mismo alcance y mismo equipo en los tres casos: 39 tickets, cinco personas, una tarifa de US$ 50 la hora. Lo único que cambia es cómo se organiza el trabajo. Esto es lo que cuesta cada camino.</p>
       </div>
 
       <!-- Iconos de estado. Un color solo no puede llevar el significado: cada
@@ -626,8 +638,8 @@ a { color: inherit; }
             <h3 class="m-name">A la antigüita</h3>
             <span class="m-badge is-ghost" aria-hidden="true">·</span>
           </header>
-          <p class="m-capex display-sm" data-count="3600" data-prefix="US$ ">US$ 3.600</p>
-          <p class="m-formula">240 horas × US$ 15</p>
+          <p class="m-capex display-sm" data-count="12000" data-prefix="US$ ">US$ 12.000</p>
+          <p class="m-formula">240 horas × US$ 50</p>
           <div class="m-bar" role="img" aria-label="100 % del presupuesto">
             <span class="m-bar-pct">100 %</span>
           </div>
@@ -652,8 +664,8 @@ a { color: inherit; }
             <h3 class="m-name">Prompts sueltos</h3>
             <span class="m-badge is-ghost" aria-hidden="true">·</span>
           </header>
-          <p class="m-capex display-sm" data-count="1365" data-prefix="US$ ">US$ 1.365</p>
-          <p class="m-formula">90 horas × US$ 15 + US$ 15 de tokens</p>
+          <p class="m-capex display-sm" data-count="4515" data-prefix="US$ ">US$ 4.515</p>
+          <p class="m-formula">90 horas × US$ 50 + US$ 15 de tokens</p>
           <div class="m-bar" role="img" aria-label="38 % del presupuesto">
             <span class="m-bar-pct">38 %</span>
           </div>
@@ -678,10 +690,10 @@ a { color: inherit; }
             <h3 class="m-name">Spec-Driven Development</h3>
             <span class="m-badge">El método de este proyecto</span>
           </header>
-          <p class="m-capex display-sm" data-count="635" data-prefix="US$ ">US$ 635</p>
-          <p class="m-formula">40 horas × US$ 15 + US$ 35 de tokens</p>
-          <div class="m-bar" role="img" aria-label="18 % del presupuesto">
-            <span class="m-bar-pct">18 %</span>
+          <p class="m-capex display-sm" data-count="2035" data-prefix="US$ ">US$ 2.035</p>
+          <p class="m-formula">40 horas × US$ 50 + US$ 35 de tokens</p>
+          <div class="m-bar" role="img" aria-label="17 % del presupuesto">
+            <span class="m-bar-pct">17 %</span>
           </div>
           <p class="m-time"><b>4 días</b> hasta producción<span class="m-flow">Tres fases avanzan a la vez, en ramas que no se cruzan.</span></p>
           <div class="m-attrs">
@@ -704,8 +716,8 @@ a { color: inherit; }
       <p class="caption methods-note reveal">En los tres casos la operación cuesta lo mismo: <b>US$ 0 al mes</b>, porque la infraestructura no cambia. Lo que cambia es lo que cuesta llegar hasta ahí.</p>
 
       <dl class="verdict">
-        <div class="reveal"><dd class="display-sm">−82 %</dd><dt>menos costo de construcción que a la antigüita: US$ 635 en lugar de US$ 3.600.</dt></div>
-        <div class="reveal"><dd class="display-sm">4,7 : 1</dd><dt>de retorno: cada dólar invertido en el método ahorra US$ 4,70 del presupuesto tradicional.</dt></div>
+        <div class="reveal"><dd class="display-sm">−83 %</dd><dt>menos costo de construcción que a la antigüita: US$ 2.035 en lugar de US$ 12.000.</dt></div>
+        <div class="reveal"><dd class="display-sm">4,9 : 1</dd><dt>de retorno: cada dólar invertido en el método ahorra US$ 4,90 del presupuesto tradicional.</dt></div>
         <div class="reveal"><dd class="display-sm">−90 %</dd><dt>menos tiempo hasta producción: de seis semanas a cuatro días.</dt></div>
       </dl>
     </div>
@@ -745,8 +757,8 @@ a { color: inherit; }
       </div>
       <ul class="assumptions reveal-stagger" style="margin-top:40px">
         <li>
-          <span class="label">Tarifa · US$ 15 / hora</span>
-          <p class="body-sm">Tarifa de referencia de un desarrollador junior en Latinoamérica. Con tarifas más altas, la brecha entre métodos crece — las horas ahorradas valen más.</p>
+          <span class="label">Tarifa · US$ 50 / hora</span>
+          <p class="body-sm">Tarifa de mercado de un desarrollador contratado por hora. Con tarifas más altas, la brecha entre métodos crece — las horas ahorradas valen más.</p>
         </li>
         <li>
           <span class="label">Horas · estimación por método</span>
