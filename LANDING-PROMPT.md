@@ -40,7 +40,7 @@ dashboard. Cinco rutas de API. Un dueño con un dashboard: un interruptor que
 apaga toda la generación, un selector de calidad de video, tres contadores y un
 gasto estimado.
 
-**La app en vivo:** <https://ia-generator-openspec.vercel.app/> — destino de
+**La app en vivo:** <https://speckit-ai-generator.vercel.app/> — destino de
 todos los CTA primarios.
 
 **El repositorio:** <https://github.com/sjunka/speckit-ai-generator>
@@ -380,7 +380,7 @@ falso.
 - Eyebrow: `Especificación primero. Código después.`
 - Titular: `Una foto entra. Un video sale.`
 - Subtítulo: `Tomas la foto, la IA la convierte en imagen, y esa imagen se vuelve un video corto que puedes descargar o compartir.`
-- Botón primario: `Probar la app` → <https://ia-generator-openspec.vercel.app/>
+- Botón primario: `Probar la app` → <https://speckit-ai-generator.vercel.app/>
 - Botón secundario (tertiary, sin relleno): `Ver cómo se construyó` → `#metodo`
 - Micro-copy bajo los botones, en `.caption`: `Sin instalar nada. Se usa desde el celular.`
 - Variante en inglés del titular, si la página se traduce: `One photo in. One video out.`
